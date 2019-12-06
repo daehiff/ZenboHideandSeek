@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         robotAPI = RobotAPI(applicationContext, robotCallback)
         robotAPI.robot.setExpression(RobotFace.WORRIED,
-                "I cannot fidn you after 0 Seconds")
+                "I cannot find you after 0 Seconds")
 
         //robotAPI.motion.moveBody(1f, 1f, 180);
         println("----- Location ----------")

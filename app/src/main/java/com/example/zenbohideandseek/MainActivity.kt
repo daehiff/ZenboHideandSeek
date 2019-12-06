@@ -19,16 +19,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         robotAPI = RobotAPI(applicationContext, robotCallback)
-        robotAPI.robot.setExpression(RobotFace.WORRIED,
-                "I cannot fidn you after 0 Seconds")
-
-        //robotAPI.motion.moveBody(1f, 1f, 180);
-        println("----- Location ----------")
-        println(robotAPI.slam.activeLocalization(1.0).toString())
-        println(robotAPI.slam.location.toString())
+        robotAPI.robot.speakAndListen("Do you want to play Hide and Seek ?", SpeakConfig())
     }
 
-    companion object {
+    override fun onPause() {
+        super.onPause()
+        robotAPI.robot.stopSpeakAndListen()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // close faical
+        robotAPI.robot.setExpression(RobotFace.HIDEFACE)
+
+        // listen user utterance
+        robotAPI.robot.speakAndListen("Do you want to play Hide and Seek ?", SpeakConfig().timeout(10f))
+
+    }
 
         var robotCallback: RobotCallback = object : RobotCallback() {
             override fun onResult(cmd: Int, serial: Int, err_code: RobotErrorCode?, result: Bundle?) {
@@ -57,7 +65,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onVoiceDetect(jsonObject: JSONObject) {
-                println(jsonObject.toString())
             }
 
             override fun onSpeakComplete(s: String, s1: String) {
@@ -65,10 +72,23 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onEventUserUtterance(jsonObject: JSONObject) {
-                
+                val text: String
+                text = "onEventUserUtterance: $jsonObject"
+                Log.d("User Utterance", text)
             }
 
             override fun onResult(jsonObject: JSONObject) {
+                val text = "onResult: $jsonObject"
+                Log.d("Listening text :", text)
+
+
+                val sIntentionID = RobotUtil.queryListenResultJson(jsonObject, "IntentionId")
+                Log.d("Listening Intention", "Intention Id = $sIntentionID")
+
+                if (sIntentionID == "helloWorld") {
+                    val sSluResultCity = RobotUtil.queryListenResultJson(jsonObject, "myCity1", null)
+                    Log.d("Listening city", "Result City = " + sSluResultCity!!)
+                }
 
             }
 
@@ -76,5 +96,4 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
-    }
 }

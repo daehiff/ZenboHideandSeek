@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.asus.robotframework.API.*
+import com.asus.robotframework.API.results.Location
 
 import org.json.JSONObject
 import java.sql.DriverManager
@@ -24,8 +25,7 @@ class MainActivity : AppCompatActivity() {
 
         //robotAPI.motion.moveBody(1f, 1f, 180);
         println("----- Location ----------")
-        println(robotAPI.slam.activeLocalization(1.0).toString())
-        println(robotAPI.slam.location.toString())
+        Log.i("ZENBO_ONC", robotAPI.slam.activeLocalization(10.0).toString())
     }
 
     companion object {
@@ -34,10 +34,9 @@ class MainActivity : AppCompatActivity() {
             override fun onResult(cmd: Int, serial: Int, err_code: RobotErrorCode?, result: Bundle?) {
                 // TODO i think here comes the command stuff? so maybe we can get our location here?
                 super.onResult(cmd, serial, err_code, result)
-                result?.let { res ->
-                    Log.i("ZENBO", res.toString())
-                } ?: run {
-                    Log.i("ZENBO", "BUNDLE IS NULL!")
+                val tmp = result?.getBundle("RESULT")?.getParcelable<Location>("LOCATION")
+                tmp.let { res ->
+                    Log.i("ZENBO_ONRES", res.toString())
                 }
             }
 
@@ -65,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onEventUserUtterance(jsonObject: JSONObject) {
-                
+
             }
 
             override fun onResult(jsonObject: JSONObject) {

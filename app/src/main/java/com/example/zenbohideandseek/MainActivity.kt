@@ -1,23 +1,23 @@
 package com.example.zenbohideandseek
 
-import androidx.appcompat.app.AppCompatActivity
-
 import android.os.Bundle
 import android.util.Log
 import com.asus.robotframework.API.*
 
-import org.json.JSONObject
-import java.sql.DriverManager
 import java.sql.DriverManager.println
 
-class MainActivity : AppCompatActivity() {
+import com.asus.robotframework.API.RobotCallback
+import com.asus.robotframework.API.RobotCmdState
+import com.asus.robotframework.API.RobotErrorCode
+import com.robot.asus.robotactivity.RobotActivity
 
-    lateinit var robotAPI: RobotAPI
+import org.json.JSONObject
 
+class MainActivity : RobotActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        super.setContentView(R.layout.activity_main)
         robotAPI = RobotAPI(applicationContext, robotCallback)
         robotAPI.robot.speakAndListen("Do you want to play Hide and Seek ?", SpeakConfig())
     }
@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         // close faical
         robotAPI.robot.setExpression(RobotFace.HIDEFACE)
 
@@ -47,6 +46,7 @@ class MainActivity : AppCompatActivity() {
                 } ?: run {
                     Log.i("ZENBO", "BUNDLE IS NULL!")
                 }
+                Log.d("robotCallback on Result",result.toString())
             }
 
             override fun onStateChange(cmd: Int, serial: Int, err_code: RobotErrorCode?, state: RobotCmdState?) {
@@ -84,11 +84,6 @@ class MainActivity : AppCompatActivity() {
 
                 val sIntentionID = RobotUtil.queryListenResultJson(jsonObject, "IntentionId")
                 Log.d("Listening Intention", "Intention Id = $sIntentionID")
-
-                if (sIntentionID == "helloWorld") {
-                    val sSluResultCity = RobotUtil.queryListenResultJson(jsonObject, "myCity1", null)
-                    Log.d("Listening city", "Result City = " + sSluResultCity!!)
-                }
 
             }
 

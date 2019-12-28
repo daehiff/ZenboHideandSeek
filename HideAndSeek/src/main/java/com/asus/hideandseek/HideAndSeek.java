@@ -63,7 +63,7 @@ public class HideAndSeek extends RobotActivity {
         seeking = new Seeking();
 
         // Turn off his wheels
-        robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xfffffff);
+        robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xff);
 
         // Disable some of his behaviours
         robotAPI.robot.setVoiceTrigger(false);

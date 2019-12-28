@@ -9,6 +9,15 @@
 
 
     <Button
+        android:id="@+id/canceltheshit"
+        style="@android:style/Widget.DeviceDefault.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop all, cancel detections"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        tools:layout_editor_absoluteX="98dp"
+        tools:layout_editor_absoluteY="257dp" />
+    <Button
         android:id="@+id/startdetection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,13 +25,6 @@
         tools:layout_editor_absoluteX="98dp"
         tools:layout_editor_absoluteY="257dp" />
 
-    <Button
-        android:id="@+id/canceltheshit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cancel detection"
-        tools:layout_editor_absoluteX="98dp"
-        tools:layout_editor_absoluteY="257dp" />
 
 
     <Button

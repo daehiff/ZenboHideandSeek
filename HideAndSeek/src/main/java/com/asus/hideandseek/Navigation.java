@@ -110,6 +110,7 @@ public class Navigation {
         if (!seekingActive) {
             return;
         }
+        HideAndSeek.seeking.state = Seeking.SeekingState.SEEKING;
         IntPoint currPt = stack.remove(stack.size() - 1); //pop
         while (visited.get(currPt) == Boolean.TRUE) {
             if (stack.size() > 0) {

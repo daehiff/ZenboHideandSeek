@@ -17,7 +17,7 @@ public class Seeking {
     public static int DEFAULT_COUNTDOWN_TIME = 5;
     public static int DEFAULT_COUNTDOWN_INTERVAL_MS = 2000;
     public enum SeekingState {
-        NOT_STARTED, SEARCHING_FOR_TARGET, ASKING_TO_PLAY, COUNTDOWN, SEEKING
+        NOT_STARTED, SEARCHING_FOR_TARGET, ASKING_TO_PLAY, COUNTDOWN, POSITIONING, SEEKING
     }
 
     public SeekingState state = SeekingState.NOT_STARTED;
@@ -58,9 +58,11 @@ public class Seeking {
 
             case SEEKING:
                 if (people.size() == 1) {
-                    HideAndSeek.robotAPI.robot.speak("Haha, I found you!");
-                    blinkAllLights(0x001111ff, 5, 50);
-                    HideAndSeek.navigation.stopAllMovement();
+                    if (people.get(0).getTrackConf() >= 1.0f) {
+                        HideAndSeek.robotAPI.robot.speak("Haha, I found you!");
+                        blinkAllLights(0x001111ff, 5, 50);
+                        stop();
+                    }
                 }
                 state = SeekingState.NOT_STARTED;
                 break;
@@ -101,13 +103,14 @@ public class Seeking {
             }
             blinkAllLights(0x00ff8800, 2, 10);
             denialCount++;
+            state = SeekingState.NOT_STARTED;
         }
     }
 
     public void handleApology() {
 //        robotAPI.robot.setExpression(RobotFace.ACTIVE)
         HideAndSeek.robotAPI.robot.speak("It's okay!");
-
+        state = SeekingState.NOT_STARTED;
         blinkAllLights(0x000055ff, 3, 50);
 
         denialCount = 0;
@@ -124,7 +127,7 @@ public class Seeking {
         HideAndSeek.robotAPI.robot.speak(Integer.toString(countdownSeconds));
 
         if (countdownSeconds >= DEFAULT_COUNTDOWN_TIME) {
-            state = SeekingState.SEEKING;
+            state = SeekingState.POSITIONING;
             countdownSeconds = 0;
             Point startPoint = new Point(11, 11);
             HideAndSeek.navigation.startSearchingRoom(startPoint);
@@ -134,8 +137,8 @@ public class Seeking {
     }
 
     private void blinkAllLights(int color, int cycles, int speed) {
-        HideAndSeek.robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xfffffff, color);
-        HideAndSeek.robotAPI.wheelLights.startBlinking(WheelLights.Lights.SYNC_BOTH, 0xfffffff, speed, speed, cycles);
+        HideAndSeek.robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, color);
+        HideAndSeek.robotAPI.wheelLights.startBlinking(WheelLights.Lights.SYNC_BOTH, 0xff, speed, speed, cycles);
     }
 
     public void switchToPersonDetection() {

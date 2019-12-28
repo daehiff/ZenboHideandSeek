@@ -1,0 +1,10 @@
+#Tue Dec 24 13:51:34 AWST 2019
+path.2=classes_0.dex
+path.1=classes.dex
+path.0=classes.dex
+renamed.2=classes3.dex
+renamed.1=classes2.dex
+renamed.0=classes.dex
+base.2=C\:\\Users\\Sulwen\\Downloads\\ZenboSDK\\ZenboSDK\\ZenboSDK\\ZenboSDK\\ZenboDialogSample\\build\\intermediates\\dex\\debug\\mergeLibDexDebug\\out
+base.1=C\:\\Users\\Sulwen\\Downloads\\ZenboSDK\\ZenboSDK\\ZenboSDK\\ZenboSDK\\ZenboDialogSample\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\out
+base.0=C\:\\Users\\Sulwen\\Downloads\\ZenboSDK\\ZenboSDK\\ZenboSDK\\ZenboSDK\\ZenboDialogSample\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\out

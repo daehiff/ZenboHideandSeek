@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../RobotActivityLibrary/RobotActivityLibrary.iml" filepath="$PROJECT_DIR$/../RobotActivityLibrary/RobotActivityLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../RobotDevSample/RobotDevSample.iml" filepath="$PROJECT_DIR$/../RobotDevSample/RobotDevSample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../RobotSensorSample/RobotSensorSample.iml" filepath="$PROJECT_DIR$/../RobotSensorSample/RobotSensorSample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ZenboDialogSample/ZenboDialogSample.iml" filepath="$PROJECT_DIR$/../ZenboDialogSample/ZenboDialogSample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ZenboGoToLocation/ZenboGoToLocation.iml" filepath="$PROJECT_DIR$/../ZenboGoToLocation/ZenboGoToLocation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ZenboHelloWorld.iml" filepath="$PROJECT_DIR$/ZenboHelloWorld.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ZenboSDK.iml" filepath="$PROJECT_DIR$/../ZenboSDK.iml" />
+    </modules>
+  </component>
+</project>

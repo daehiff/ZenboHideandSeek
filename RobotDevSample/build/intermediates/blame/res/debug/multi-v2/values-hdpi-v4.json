@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "/Users/juliafiorino/Documents/Senior/Fall (Taiwan)/Robotics/ZenboSDKv3/ZenboSDK/ZenboSDK/ZenboSDKv3/RobotDevSample/build/intermediates/incremental/mergeDebugResources/merged.dir/values-hdpi-v4/values-hdpi-v4.xml",
+            "map": [
+                {
+                    "source": "/Users/juliafiorino/.gradle/caches/transforms-2/files-2.1/8865256cae6ec330c22c53e2d9795ef0/res/values-hdpi-v4/values-hdpi-v4.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "13",
+                        "endOffsets": "327"
+                    }
+                }
+            ]
+        }
+    ]
+}

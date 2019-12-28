@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+
+    <Button
+        android:id="@+id/startdetection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1. Start detections"
+        tools:layout_editor_absoluteX="98dp"
+        tools:layout_editor_absoluteY="257dp" />
+
+    <Button
+        android:id="@+id/canceltheshit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel detection"
+        tools:layout_editor_absoluteX="98dp"
+        tools:layout_editor_absoluteY="257dp" />
+
+
+    <Button
+        android:id="@+id/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2. Start seeking"
+        tools:layout_editor_absoluteX="98dp"
+        tools:layout_editor_absoluteY="257dp" />
+
+    <TextView
+        android:id="@+id/statuslabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_weight="0.08"
+        android:text="SEEKING STATE:"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Retrieving status..."
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:text="DONT FORGET TO CANCEL THE DETECTION BEFORE KILLING THE APP"
+        android:textAlignment="center"
+        android:textAllCaps="true"
+        android:textColor="#E20E0E"
+        android:textSize="24sp" />
+</LinearLayout>

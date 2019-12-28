@@ -1,15 +1,9 @@
 package com.asus.hideandseek;
 
-import android.os.Bundle;
 import android.util.Log;
 
-import com.asus.robotframework.API.RobotAPI;
-import com.asus.robotframework.API.RobotCallback;
-import com.asus.robotframework.API.RobotCmdState;
-import com.asus.robotframework.API.RobotErrorCode;
 import com.asus.robotframework.API.results.Location;
 import com.asus.robotframework.API.results.RoomInfo;
-import com.robot.asus.robotactivity.RobotActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,32 +142,4 @@ public class Navigation {
             }
         }
     }
-
-    public static RobotCallback robotCallback = new RobotCallback() {
-        @Override
-        public void initComplete() {
-            super.initComplete();
-        }
-
-        @Override
-        public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
-            super.onResult(cmd, serial, err_code, result);
-        }
-
-        @Override
-        public void onStateChange(int cmd, int serial, RobotErrorCode err_code, RobotCmdState state) {
-            super.onStateChange(cmd, serial, err_code, state);
-            // 41 = a to b
-            if (cmd == 41 && state == RobotCmdState.SUCCEED) {
-                // keep going
-                continueSearch();
-            } else if (state == RobotCmdState.ACTIVE) {
-                // do nothing
-            } else if (state == RobotCmdState.FAILED) {
-                // do some error handling
-            }
-        }
-    };
-
-
 }

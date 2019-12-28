@@ -149,6 +149,15 @@ public class HideAndSeek extends RobotActivity {
         @Override
         public void onStateChange(int cmd, int serial, RobotErrorCode err_code, RobotCmdState state) {
             super.onStateChange(cmd, serial, err_code, state);
+            // 41 = a to b
+            if (cmd == 41 && state == RobotCmdState.SUCCEED) {
+                // keep going
+                navigation.continueSearch();
+            } else if (state == RobotCmdState.ACTIVE) {
+                // do nothing
+            } else if (state == RobotCmdState.FAILED) {
+                // do some error handling
+            }
         }
 
         @Override

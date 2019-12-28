@@ -81,7 +81,7 @@ public class Navigation extends RobotActivity {
 
     public boolean startSearch(Point startPt) {
         stack.add(new IntPoint((int)startPt.x, (int)startPt.y));
-        Log.d("ZenboGoToLocation", "Start Pt" + startPt.x + " " + startPt.y);
+        Log.d("ZenboGoToLocation", "Start Point" + startPt.x + " " + startPt.y);
 
         IntPoint currPt = stack.remove(stack.size() - 1); //pop
 

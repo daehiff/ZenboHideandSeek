@@ -143,7 +143,7 @@ public class MainActivity extends RobotActivity {
             @Override
             public void onClick(View v) {
 
-                // request READ_CONTACTS permission
+                // request READ_CONTACTS permission please
                 requestPermission();
 
             }

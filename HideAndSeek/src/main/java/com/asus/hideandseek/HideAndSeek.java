@@ -1,6 +1,9 @@
 package com.asus.hideandseek;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +33,9 @@ public class HideAndSeek extends RobotActivity {
     public static Navigation navigation;
     public static TextView statusText;
     public Context context = this;
+
+    // request code for READ_CONTACTS. It can be any number > 0.
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
 
     public HideAndSeek(RobotCallback robotCallback, RobotCallback.Listen robotListenCallback) {
         super(robotCallback, robotListenCallback);
@@ -61,6 +67,8 @@ public class HideAndSeek extends RobotActivity {
         robotAPI.robot.setPressOnHeadAction(false);
         seeking.stop();
 
+        // Ask for contacts permission
+        requestPermission();
 
         // Register actions to UI buttons for debugging
         // TODO: Should be removed in the final version
@@ -181,4 +189,28 @@ public class HideAndSeek extends RobotActivity {
         super(robotCallback, robotListenCallback);
     }
 
+    private void requestPermission() {
+        // Check the SDK version and whether the permission is already granted or not.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                this.checkSelfPermission(Manifest.permission.READ_CONTACTS) ==
+                        PackageManager.PERMISSION_GRANTED) {
+            // Android version is lesser than 6.0 or the permission is already granted.
+            Log.d("ZenboGoToLocation", "permission is already granted");
+            return;
+        }
+
+        if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
+                    PERMISSIONS_REQUEST_READ_CONTACTS);
+        } else {
+            //showMessageOKCancel("You need to allow access to Contacts",
+            //        new DialogInterface.OnClickListener() {
+            //            @Override
+            //            public void onClick(DialogInterface dialog, int which) {
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
+                    PERMISSIONS_REQUEST_READ_CONTACTS);
+            //            }
+            //        });
+        }
+    }
 }

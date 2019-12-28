@@ -126,7 +126,8 @@ public class Seeking {
         if (countdownSeconds >= DEFAULT_COUNTDOWN_TIME) {
             state = SeekingState.SEEKING;
             countdownSeconds = 0;
-            HideAndSeek.navigation.startSearchingRoom();
+            Point startPoint = new Point(11, 11);
+            HideAndSeek.navigation.startSearchingRoom(startPoint);
         } else {
             delayHandler.postDelayed(repeatCountdown, 2000);
         }

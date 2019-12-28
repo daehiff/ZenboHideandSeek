@@ -1,6 +1,7 @@
 package com.asus.zenbogotolocation;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,15 +11,68 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.asus.robotframework.API.RobotAPI;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
+import com.asus.robotframework.API.results.Location;
 import com.asus.robotframework.API.results.RoomInfo;
 import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+class Point {
+    double x;
+    double y;
+
+    public Point(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public boolean equals (Object o) {
+        Point point = (Point) o;
+        return ((int) this.x == (int) point.x) && ((int) this.y == (int) point.y);
+    }
+
+    // https://stackoverflow.com/questions/38675611/determine-if-point-is-in-set-of-coordinates-in-java
+    public boolean insidePolygon(ArrayList<Point> polygon) {
+        // figure out if its inside
+        int intersections = 0;
+        Point prev = polygon.get(polygon.size() - 1);
+        for (Point next : polygon) {
+            if ((prev.y <= this.y && this.y < next.y) || (prev.y >= this.y && this.y > next.y)) {
+                double dy = next.y - prev.y;
+                double dx = next.x - prev.x;
+                double x = (this.y - prev.y) / dy * dx + prev.x;
+                if (x > this.x) {
+                    intersections++;
+                }
+            }
+            prev = next;
+        }
+        return intersections % 2 == 1;
+    }
+}
+
+class IntPoint {
+    int x;
+    int y;
+
+    public IntPoint(int intX, int intY) {
+        this.x = intX;
+        this.y = intY;
+    }
+}
+
+
 
 public class MainActivity extends RobotActivity {
 
@@ -27,9 +81,20 @@ public class MainActivity extends RobotActivity {
 
     // robotAPI flags
     private static boolean isRobotApiInitialed = false;
+    public static RobotAPI robotAPI;
+
+    // localization flags
+    private static boolean isRobotLocalized = false;
 
     // 1st roomInfo string
     private String sFirstRoom;
+
+    //Context
+    public Context context = this;
+
+    // location
+    private static Point currentPoint;
+    private static ArrayList<Point> points;
 
     // buttons
     private Button mButtonGrantPermission;
@@ -44,6 +109,10 @@ public class MainActivity extends RobotActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        robotAPI = new RobotAPI(context, robotCallback);
+
+        robotAPI.robot.setPressOnHeadAction(false);
 
         // textViews
         mTextViewPermissionStatus = (TextView) findViewById(R.id.textView_permission_status);
@@ -72,10 +141,31 @@ public class MainActivity extends RobotActivity {
                     ArrayList<RoomInfo> arrayListRooms = robotAPI.contacts.room.getAllRoomInfo();
 
                     sFirstRoom = arrayListRooms.get(0).keyword;
-                    Log.d("ZenboGoToLocation", "arrayListRooms = " + arrayListRooms);
-                    Log.d("ZenboGoToLocation", "arrayListRooms(0) = " + sFirstRoom);
+                    String sLineString = arrayListRooms.get(0).wkt;
+                    points =  Navigation.lineStringToPoints(sLineString);
+                    Log.d("ZenboGoToLocation", "list of points = " + points);
+
+                    Point point1 = new Point(9, 9);
+                    Point point2 = new Point(11, 9);
+                    Point point3 = new Point(7, 6);
+
+                    boolean inside1 = point1.insidePolygon(points);
+                    boolean inside2 = point2.insidePolygon(points);
+                    boolean inside3 = point3.insidePolygon(points);
+
+                    Log.d("ZenboGoToLocation", "inside? = " + inside1 + inside2 + inside3);
+
                     mTextViewFirstRoomKeyword.setText(sFirstRoom);
-                    mButtonGoTo.setEnabled(true);
+
+                    //robotAPI.slam.activeLocalization();
+                    Log.d("ZenboGoToLocation", "just send the command to get location");
+
+                    Navigation navigation = new Navigation(robotCallback, robotListenCallback, robotAPI);
+                    Point startPt = new Point(11, 11);
+                    navigation.conductSearch(points, startPt);
+
+                    //mButtonGoTo.setEnabled(true);
+                    //mButtonGetRoomInfo.setEnabled(false);
 
                 }
                 catch (Exception e){
@@ -100,11 +190,7 @@ public class MainActivity extends RobotActivity {
                 }
             }
         });
-
-
     }
-
-
 
     @Override
     protected void onResume() {
@@ -134,8 +220,6 @@ public class MainActivity extends RobotActivity {
 
     }
 
-
-
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
         public void initComplete() {
@@ -147,7 +231,22 @@ public class MainActivity extends RobotActivity {
 
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
-            super.onResult(cmd, serial, err_code, result);
+            Log.d("ZenboGoToLocation", "onResult");
+//            if (!isRobotLocalized) {
+//                isRobotLocalized = true;
+//                super.onResult(cmd, serial, err_code, result);
+//                Bundle bundle = result.getBundle("RESULT");
+//                Location currentLocation = bundle.getParcelable("LOCATION");
+//                Log.d("ZenboGoToLocation", "currentLocation" + currentLocation + currentLocation.coordinate);
+//                if (currentLocation != null) {
+//                    currentPoint = new Point(currentLocation.coordinate.x, currentLocation.coordinate.y);
+//                    Log.d("ZenboGoToLocation", "currentLocation" + currentLocation + currentLocation.coordinate);
+//                    Log.d("ZenboGoToLocation", "currentLocationxy" + currentLocation.coordinate.x + " " + currentLocation.coordinate.y);
+//                    //int startIdx = Navigation.indexOfInt(points, currentPoint);
+//                    //Navigation navigation = new Navigation(robotCallback, robotListenCallback, robotAPI);
+//                    //navigation.conductSearch(points, currentPoint);
+//                }
+//            }
         }
 
         @Override

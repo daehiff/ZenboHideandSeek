@@ -65,8 +65,7 @@ public class HideAndSeek extends RobotActivity {
         // Disable some of his behaviours
         robotAPI.robot.setVoiceTrigger(false);
         robotAPI.robot.setPressOnHeadAction(false);
-        seeking.stop();
-
+        
         // Ask for contacts permission
         requestPermission();
 

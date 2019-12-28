@@ -1,10 +1,13 @@
 package com.asus.zenbogotolocation;
 
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.asus.robotframework.API.RobotAPI;
 import com.asus.robotframework.API.RobotCallback;
+import com.asus.robotframework.API.RobotCmdState;
+import com.asus.robotframework.API.RobotErrorCode;
 import com.asus.robotframework.API.results.Location;
 import com.robot.asus.robotactivity.RobotActivity;
 
@@ -14,11 +17,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Navigation extends RobotActivity {
-    private RobotAPI robotAPI;
+    private static RobotAPI robotAPI;
+    private static ArrayList<IntPoint> stack = new ArrayList<IntPoint>();
+    private static Map<IntPoint, Boolean> visited = new HashMap<IntPoint, Boolean>();
+    private static ArrayList<Point> map;
+    private static boolean foundPlayer = false;
 
-    public Navigation(RobotCallback robotCallback, RobotCallback.Listen robotListenCallback, RobotAPI robotAPI) {
+    public Navigation(RobotCallback robotCallback, RobotCallback.Listen robotListenCallback, RobotAPI robotAPI, ArrayList<Point> points, boolean foundPlayer) {
         super(robotCallback, robotListenCallback);
         this.robotAPI = robotAPI;
+        this.map = points;
+        this.foundPlayer = foundPlayer;
     }
 
     public static ArrayList<Point> lineStringToPoints(String lineString) {
@@ -37,37 +46,31 @@ public class Navigation extends RobotActivity {
     }
 
     public static ArrayList<IntPoint> getAdjacentPoints(ArrayList<Point> map, IntPoint point) {
-        ArrayList<IntPoint> adjacentPoints = new ArrayList<IntPoint>();
-        Point up = new Point(point.x, point.y + 1.0);
-        Point right = new Point(point.x + 1.0, point.y);
-        Point down = new Point(point.x, point.y - 1.0);
-        Point left = new Point(point.x - 1.0, point.y);
+        Log.d("ZenboGoToLocation", "get adjacentpoints");
+        ArrayList<Point> points= new ArrayList<Point>();
 
-        if (up.insidePolygon(map)) {
-            Log.d("ZenboGoToLocation", "up in polygon");
-            IntPoint upInt = new IntPoint((int) up.x, (int) up.y);
-            adjacentPoints.add(upInt);
-        }
-        if (right.insidePolygon(map)) {
-            Log.d("ZenboGoToLocation", "right in polygon");
-            IntPoint rightInt = new IntPoint((int) right.x, (int) right.y);
-            adjacentPoints.add(rightInt);
-        }
-        if (down.insidePolygon(map)) {
-            Log.d("ZenboGoToLocation", "down in polygon");
-            IntPoint downInt = new IntPoint((int) down.x, (int) down.y);
-            adjacentPoints.add(downInt);
-        }
-        if (left.insidePolygon(map)) {
-            Log.d("ZenboGoToLocation", "left in polygon");
-            IntPoint leftInt = new IntPoint((int) left.x, (int) left.y);
-            adjacentPoints.add(leftInt);
+        Point up = new Point(point.x, point.y + 1.0);
+        points.add(up);
+        Point right = new Point(point.x + 1.0, point.y);
+        points.add(right);
+        Point down = new Point(point.x, point.y - 1.0);
+        points.add(down);
+        Point left = new Point(point.x - 1.0, point.y);
+        points.add(left);
+
+        ArrayList<IntPoint> adjacentPoints = new ArrayList<IntPoint>();
+
+        for (Point pt : points) {
+            if (pt.insidePolygon(map)) {
+                IntPoint intPt = new IntPoint((int) pt.x, (int) pt.y);
+                adjacentPoints.add(intPt);
+            }
         }
 
         return adjacentPoints;
     }
 
-    public void goToLocation(IntPoint point) {
+    public static void goToLocation(IntPoint point) {
         Location location = new Location();
         location.coordinate.x = (float) point.x;
         location.coordinate.y = (float) point.y;
@@ -76,70 +79,76 @@ public class Navigation extends RobotActivity {
         Log.d("ZenboGoToLocation", "going to location" + point.x + " " + point.y);
     }
 
-    //pause 3 seconds
-    public void pause() {
-        new CountDownTimer(3000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-            }
-        }.start();
-    }
-
-    // BFS @TODO CHANGE TO DFS
-    public boolean conductSearch(ArrayList<Point> map, Point startPt) {
-        Log.d("ZenboGoToLocation", "starting to search");
-
-        ArrayList<IntPoint> queue = new ArrayList<IntPoint>();
-        Map<IntPoint, Boolean> visited = new HashMap<IntPoint, Boolean>();
-
-        visited.put(new IntPoint((int) startPt.x, (int) startPt.y), Boolean.TRUE);
-
-        queue.add(new IntPoint((int)startPt.x, (int)startPt.y));
+    public boolean startSearch(Point startPt) {
+        stack.add(new IntPoint((int)startPt.x, (int)startPt.y));
         Log.d("ZenboGoToLocation", "Start Pt" + startPt.x + " " + startPt.y);
 
-        while (queue.size() > 0) {
-            IntPoint currPt = queue.remove(0); //pop
+        IntPoint currPt = stack.remove(stack.size() - 1); //pop
 
+        if (visited.get(currPt) == null) {
+            visited.put(currPt, Boolean.FALSE);
+        }
+
+        // if the point is not discovered, then check for the person, then add its neighbors
+        if (visited.get(currPt) == Boolean.FALSE) {
             // @TODO implement logic for finding the person
             goToLocation(currPt);
-            //pause();
+
             if (false) { // @TODO DID WE FIND THEM
+                foundPlayer = true;
                 return true;
             }
+
+            visited.put(currPt, Boolean.TRUE);
 
             ArrayList<IntPoint> adjacentPoints = getAdjacentPoints(map, currPt);
             for (int i = 0; i < adjacentPoints.size(); i++) {
                 IntPoint adjacentPoint = adjacentPoints.get(i);
+                stack.add(adjacentPoint);
                 Log.d("ZenboGoToLocation", "adjacentPoint" + adjacentPoint.x + " " + adjacentPoint.y);
-
-                // since we haven't initialized visited yet, we need to initialize it here
-                if (visited.get(adjacentPoint) == null) {
-                    visited.put(adjacentPoint, Boolean.FALSE);
-                }
-                if (visited.get(adjacentPoint) == Boolean.FALSE) {
-                    visited.put(adjacentPoint, Boolean.TRUE);
-                    queue.add(adjacentPoint);
-                }
-            }
-            Log.d("ZenboGoToLocation", "queue size" + queue.size());
-            if (queue.size() > 10) {
-                return true;
             }
         }
 
         return false;
     }
 
-    public static int indexOfInt(ArrayList<Point> points, Point point) {
-        for (int i = 0; i < points.size(); i++) {
-            Point currPt = points.get(i);
-            if (((int) currPt.x == (int) point.x) && ((int) currPt.y == (int) point.y)) {
-                return i;
+    public static boolean continueSearch() {
+        IntPoint currPt = stack.remove(stack.size() - 1); //pop
+        while (visited.get(currPt) == Boolean.TRUE) {
+            if (stack.size() > 0) {
+                currPt = stack.remove(stack.size() - 1);
+            } else { // no more points left
+                return true;
             }
         }
-        return -1;
+
+        // since we haven't initialized visited yet, we need to initialize it here
+        if (visited.get(currPt) == null) {
+            visited.put(currPt, Boolean.FALSE);
+        }
+
+        if (stack.size() > 0) {
+            // if the point is not discovered, then check for the person, then add its neighbors
+            if (visited.get(currPt) == Boolean.FALSE) {
+                // @TODO implement logic for finding the person
+                goToLocation(currPt);
+
+                if (false) { // @TODO DID WE FIND THEM
+                    foundPlayer = true;
+                    return true;
+                }
+
+                Log.d("ZenboGoToLocation", "Marking point as visited: " + currPt.x + " " + currPt.y);
+                visited.put(currPt, Boolean.TRUE);
+
+                ArrayList<IntPoint> adjacentPoints = getAdjacentPoints(map, currPt);
+                for (int i = 0; i < adjacentPoints.size(); i++) {
+                    IntPoint adjacentPoint = adjacentPoints.get(i);
+                    stack.add(adjacentPoint);
+                    Log.d("ZenboGoToLocation", "adjacentPoint" + adjacentPoint.x + " " + adjacentPoint.y);
+                }
+            }
+        }
+        return false;
     }
 }

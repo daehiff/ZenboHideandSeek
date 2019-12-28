@@ -15,6 +15,7 @@ import com.asus.robotframework.API.RobotAPI;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
+import com.asus.robotframework.API.RobotFace;
 import com.asus.robotframework.API.results.Location;
 import com.asus.robotframework.API.results.RoomInfo;
 import com.robot.asus.robotactivity.RobotActivity;
@@ -36,14 +37,13 @@ class Point {
         this.y = y;
     }
 
-    @Override
-    public boolean equals (Object o) {
-        Point point = (Point) o;
-        return ((int) this.x == (int) point.x) && ((int) this.y == (int) point.y);
-    }
+//    @Override
+//    public boolean equals (Object o) {
+//        Point point = (Point) o;
+//        return ((int) this.x == (int) point.x) && ((int) this.y == (int) point.y);
+//    }
 
-    // https://stackoverflow.com/questions/38675611/determine-if-point-is-in-set-of-coordinates-in-java
-    public boolean insidePolygon(ArrayList<Point> polygon) {
+      public boolean insidePolygon(ArrayList<Point> polygon) {
         // figure out if its inside
         int intersections = 0;
         Point prev = polygon.get(polygon.size() - 1);
@@ -70,6 +70,20 @@ class IntPoint {
         this.x = intX;
         this.y = intY;
     }
+
+    @Override
+    public boolean equals (Object o) {
+        IntPoint point = (IntPoint) o;
+        return (this.x == point.x) && (this.y == point.y);
+    }
+
+    // https://stackoverflow.com/questions/9135759/java-hashcode-for-a-point-class
+    @Override
+    public int hashCode() {
+        int result = x;
+        result = 31 * result + y;
+        return result;
+    }
 }
 
 
@@ -92,9 +106,11 @@ public class MainActivity extends RobotActivity {
     //Context
     public Context context = this;
 
-    // location
+    // Navigation
+    private static Navigation navigation;
     private static Point currentPoint;
     private static ArrayList<Point> points;
+    private static boolean foundPlayer = false;
 
     // buttons
     private Button mButtonGrantPermission;
@@ -113,6 +129,8 @@ public class MainActivity extends RobotActivity {
         robotAPI = new RobotAPI(context, robotCallback);
 
         robotAPI.robot.setPressOnHeadAction(false);
+        // Hide his face ( -!- important to see the UI )
+        robotAPI.robot.setExpression(RobotFace.HIDEFACE);
 
         // textViews
         mTextViewPermissionStatus = (TextView) findViewById(R.id.textView_permission_status);
@@ -143,7 +161,7 @@ public class MainActivity extends RobotActivity {
                     sFirstRoom = arrayListRooms.get(0).keyword;
                     String sLineString = arrayListRooms.get(0).wkt;
                     points =  Navigation.lineStringToPoints(sLineString);
-                    Log.d("ZenboGoToLocation", "list of points = " + points);
+                    Log.d("ZenboGoToLocation", "list of points = " + sLineString);
 
                     Point point1 = new Point(9, 9);
                     Point point2 = new Point(11, 9);
@@ -160,9 +178,10 @@ public class MainActivity extends RobotActivity {
                     //robotAPI.slam.activeLocalization();
                     Log.d("ZenboGoToLocation", "just send the command to get location");
 
-                    Navigation navigation = new Navigation(robotCallback, robotListenCallback, robotAPI);
+                    navigation = new Navigation(robotCallback, robotListenCallback, robotAPI, points, foundPlayer);
                     Point startPt = new Point(11, 11);
-                    navigation.conductSearch(points, startPt);
+                    //navigation.conductSearch(points, startPt);
+                    navigation.startSearch(startPt);
 
                     //mButtonGoTo.setEnabled(true);
                     //mButtonGetRoomInfo.setEnabled(false);
@@ -232,26 +251,29 @@ public class MainActivity extends RobotActivity {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
             Log.d("ZenboGoToLocation", "onResult");
-//            if (!isRobotLocalized) {
-//                isRobotLocalized = true;
-//                super.onResult(cmd, serial, err_code, result);
-//                Bundle bundle = result.getBundle("RESULT");
-//                Location currentLocation = bundle.getParcelable("LOCATION");
-//                Log.d("ZenboGoToLocation", "currentLocation" + currentLocation + currentLocation.coordinate);
-//                if (currentLocation != null) {
-//                    currentPoint = new Point(currentLocation.coordinate.x, currentLocation.coordinate.y);
-//                    Log.d("ZenboGoToLocation", "currentLocation" + currentLocation + currentLocation.coordinate);
-//                    Log.d("ZenboGoToLocation", "currentLocationxy" + currentLocation.coordinate.x + " " + currentLocation.coordinate.y);
-//                    //int startIdx = Navigation.indexOfInt(points, currentPoint);
-//                    //Navigation navigation = new Navigation(robotCallback, robotListenCallback, robotAPI);
-//                    //navigation.conductSearch(points, currentPoint);
-//                }
-//            }
+            super.onResult(cmd, serial, err_code, result);
+            Bundle bundle = result.getBundle("RESULT");
+            Location currentLocation = bundle.getParcelable("LOCATION");
+            Log.d("ZenboGoToLocation", "currentLocation" + currentLocation + currentLocation.coordinate);
         }
 
         @Override
         public void onStateChange(int cmd, int serial, RobotErrorCode err_code, RobotCmdState state) {
             super.onStateChange(cmd, serial, err_code, state);
+            // GAME OVER
+            if (foundPlayer) {
+                return;
+            }
+
+            // 41 = a to b
+            if (cmd == 41 && state == RobotCmdState.SUCCEED) {
+                // keep going
+                navigation.continueSearch();
+            } else if (state == RobotCmdState.ACTIVE) {
+                // do nothing
+            } else if (state == RobotCmdState.FAILED) {
+                // do some error handling
+            }
         }
     };
 

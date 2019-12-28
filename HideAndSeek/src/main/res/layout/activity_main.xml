@@ -33,6 +33,29 @@
         tools:layout_editor_absoluteX="98dp"
         tools:layout_editor_absoluteY="257dp" />
 
+
+    <Button
+        android:id="@+id/user_yes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User said: Yes"
+        tools:layout_editor_absoluteX="98dp"
+        tools:layout_editor_absoluteY="257dp" />
+    <Button
+        android:id="@+id/user_no"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User said: No"
+        tools:layout_editor_absoluteX="98dp"
+        tools:layout_editor_absoluteY="257dp" />
+    <Button
+        android:id="@+id/user_sorry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User said: Sorry"
+        tools:layout_editor_absoluteX="98dp"
+        tools:layout_editor_absoluteY="257dp" />
+
     <TextView
         android:id="@+id/statuslabel"
         android:layout_width="wrap_content"

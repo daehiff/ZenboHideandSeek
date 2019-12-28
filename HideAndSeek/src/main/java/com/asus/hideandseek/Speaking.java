@@ -11,55 +11,59 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class Speaking {
-    private RobotAPI robotAPI;
     private SpeakConfig config = new SpeakConfig();
 
-    public Speaking(RobotAPI robotAPI) {
-        this.robotAPI = robotAPI;
-
+    public Speaking() {
         config.timeout(10f);
         config.listenCurrentDomain(true);
     }
 
-    public void askForPlay() {
-        robotAPI.robot.stopSpeakAndListen();
-        robotAPI.robot.speakAndListen("Do you want to play hide and seek with me?",
-                config);
+    public void say(String sentence) {
+        // TODO: THIS HASN'T BEEN FIXED YET!
+        HideAndSeek.robotAPI.robot.stopSpeakAndListen();
+        HideAndSeek.robotAPI.robot.speak(sentence);
     }
 
-    public void handleUserConversation(Seeking seeking, JSONObject jsonObject){
-        try {
-            switch (seeking.state) {
-                case ASKING_TO_PLAY:
-                    String currentUserUtterance = jsonObject.getJSONObject("event_user_utterance").getString("user_utterance");
-                    if (currentUserUtterance.contains("yes")) {
-                        Log.d("HideAndSeek", "User answer contains Yes");
-                        this.robotAPI.robot.stopSpeakAndListen();
-                        seeking.startLookingForTarget();
-                    } else {
-                        Log.d("HideAndSeek", "User answer doesn't contain yes");
-                        break;
-                    }
-                    break;
+    public void askForPlay() {
+        // TODO: Temporarily disabled until broken askForPlay() shit is fixed
+        HideAndSeek.robotAPI.robot.stopSpeakAndListen();
+        HideAndSeek.robotAPI.robot.speak("Do you want to play? Press the buttons to answer.");
+//        HideAndSeek.robotAPI.robot.speakAndListen("Do you want to play hide and seek with me?",
+//                config);
+    }
 
-                    default:
-                        Log.d("HideAndSeek", "Not asking to play");
-                    break;
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void handleUserConversation(Seeking seeking, JSONObject jsonObject) {
+        switch (seeking.state) {
+            case ASKING_TO_PLAY:
+                ArrayList sentences = getUserSentences(jsonObject);
+
+                if (didUserSay(sentences, "yes")) {
+                    seeking.handleUserAnswer(true);
+                } else if (didUserSay(sentences, "no")) {
+                    seeking.handleUserAnswer(false);
+                } else if (didUserSay(sentences, "sorry")) {
+                    seeking.handleApology();
+                } else {
+                    say("Sorry, I didn't understand you.");
+                    seeking.state = Seeking.SeekingState.SEARCHING_FOR_TARGET;
+                }
+                break;
+
+            default:
+                Log.d("HideAndSeek", "Not asking to play");
+            break;
         }
     }
 
-    private ArrayList getUserSentences(JSONObject userUtteranceEvent)  {
-        String utterancesString = null;
+    private ArrayList<String> getUserSentences(JSONObject userUtteranceObject)  {
         try {
-            utterancesString = userUtteranceEvent.getString("user_utterance");
+            JSONObject userUtteranceEvent = userUtteranceObject.getJSONObject("user_utterance_event");
+            String utterancesString = userUtteranceEvent.getString("user_utterance");
             JSONArray utterances = new JSONArray(utterancesString);
             int count = utterances.length();
             ArrayList sentences = new ArrayList<String>();
 
-            for(int i=0;i<count-1;i++){
+            for(int i = 0; i < count - 1; i++){
                 JSONObject utterance = utterances.getJSONObject(i);
                 String csrType = utterance.getString("CsrType");
 
@@ -71,12 +75,11 @@ public class Speaking {
             }
             return sentences;
         } catch (JSONException e) {
-            e.printStackTrace();
+            return new ArrayList<String>();
         }
-        return null;
     }
 
-    public boolean didUserMentioned(ArrayList<String> sentences, String word){
+    public boolean didUserSay(ArrayList<String> sentences, String word){
         for (int i=0;i<sentences.size();i++) {
             if (sentences.get(i).contains(word)) {
                 return true;
@@ -85,9 +88,7 @@ public class Speaking {
         return false;
     }
 
-    public boolean didUserMentioned(JSONObject userUtteranceEvent, String word) {
-        return didUserMentioned(getUserSentences(userUtteranceEvent), word);
+    public boolean didUserSay(JSONObject userUtteranceEvent, String word) {
+        return didUserSay(getUserSentences(userUtteranceEvent), word);
     }
-
-
 }

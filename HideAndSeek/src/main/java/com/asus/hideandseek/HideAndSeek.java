@@ -24,12 +24,12 @@ import org.json.JSONObject;
 import java.util.List;
 
 public class HideAndSeek extends RobotActivity {
-    public RobotAPI robotAPI;
+    public static RobotAPI robotAPI;
     public static Seeking seeking;
     public static Speaking speaking;
+    public static Navigation navigation;
     public static TextView statusText;
     public Context context = this;
-    public static String playerId = null;
 
     public HideAndSeek(RobotCallback robotCallback, RobotCallback.Listen robotListenCallback) {
         super(robotCallback, robotListenCallback);
@@ -49,8 +49,9 @@ public class HideAndSeek extends RobotActivity {
         robotAPI.robot.setExpression(RobotFace.HIDEFACE);
 
         // Intialize behaviours
-        speaking = new Speaking(robotAPI);
-        seeking = new Seeking(robotAPI, speaking);
+        speaking = new Speaking();
+        navigation = new Navigation();
+        seeking = new Seeking();
 
         // Turn off his wheels
         robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xfffffff);
@@ -62,82 +63,79 @@ public class HideAndSeek extends RobotActivity {
 
 
         // Register actions to UI buttons for debugging
-        Button resetButton = findViewById(R.id.startdetection);
-                resetButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        seeking.state = Seeking.SeekingState.SEARCHING_FOR_TARGET;
-                        seeking.switchToFaceDetection();
-                        statusText.setText(seeking.state.toString());
-                    }
-                });
+        // TODO: Should be removed in the final version
+        Button startDetectionButton = findViewById(R.id.startdetection);
+            startDetectionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                seeking.switchToPersonDetection();
+                statusText.setText(seeking.state.toString());
+                }
+            });
 
         Button cancelButton = findViewById(R.id.canceltheshit);
-                cancelButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        seeking.stop();
-                        statusText.setText("Stopped detections");
-                    }
-                });
+            cancelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                seeking.stop();
+                statusText.setText("Stopped detections");
+                }
+            });
 
         Button startButton = findViewById(R.id.start);
-                startButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        seeking.startLookingForTarget();
-                        statusText.setText(seeking.state.toString());
-                    }
-                });
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                seeking.startLookingForTarget();
+                statusText.setText(seeking.state.toString());
+            }
+        });
 
-        //ime hide
-        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        //robotAPI = new RobotAPI(this, robotCallback);
-        //robotAPI.robot.speakAndListen("Do you want to play Hide and Seek ?", new SpeakConfig().timeout(30));
+        findViewById(R.id.user_yes).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                seeking.handleUserAnswer(true);
+            }
+        });
+
+        findViewById(R.id.user_no).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                seeking.handleUserAnswer(false);
+            }
+        });
+
+        findViewById(R.id.user_sorry).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                seeking.handleApology();
+            }
+        });
     }
-
-
-
-
 
     public static RobotCallback robotCallback = new RobotCallback() {
 
         @Override
-        public void onDetectFaceResult(List<DetectFaceResult> resultList){
+        public void onDetectFaceResult(List<DetectFaceResult> resultList) {
             super.onDetectFaceResult(resultList);
-            Log.d("onDetectFaceResult", resultList.toString());
-            playerId = resultList.get(0).getUuid();
-            seeking.handlePersonDetection(resultList, playerId);
+            seeking.handleFaceDetection(resultList);
             statusText.setText(seeking.state.toString());
         }
 
         @Override
-        public void onDetectPersonResult(List<DetectPersonResult> resultList){
+        public void onDetectPersonResult(List<DetectPersonResult> resultList) {
             super.onDetectPersonResult(resultList);
-            Log.d("Enter detect person", "Detect Person");
             seeking.handlePersonDetection(resultList);
             statusText.setText(seeking.state.toString());
-                //for (int i = 0; i < resultList.size(); i++) {
-                    //Log.d("onDetectPersonResult", resultList.get(i).toString());
-              //  }
-
         }
 
-        /*public void onDetectFaceResult(resultList: MutableList<DetectFaceResult>) {
-            resultList.forEach {
-                println("detectFace\t\t\ttid %d\t\tuuid %s\t\thpconf %d\t\t%s\t\t%s".format(it.trackID, it.uuid,
-                        it.headPoseConfidence, if (it.hasValidDepth()) "valid depth" else "invalid depth",
-                if (it.isCandidateObj) "candidate" else "full"))
-            }
-
-        }*/
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
             super.onResult(cmd, serial, err_code, result);
-            Log.d("RobotDevSample", "onResult:"
-                    + RobotCommand.getRobotCommand(cmd).name()
-                    + ", serial:" + serial + ", err_code:" + err_code
-                    + ", result:" + result.getString("RESULT"));
+//            Log.d("RobotDevSample", "onResult:"
+//                    + RobotCommand.getRobotCommand(cmd).name()
+//                    + ", serial:" + serial + ", err_code:" + err_code
+//                    + ", result:" + result.getString("RESULT"));
         }
 
         @Override
@@ -154,19 +152,13 @@ public class HideAndSeek extends RobotActivity {
 
     public static RobotCallback.Listen robotListenCallback = new RobotCallback.Listen() {
         @Override
-        public void onFinishRegister() {
-
-        }
+        public void onFinishRegister() { }
 
         @Override
-        public void onVoiceDetect(JSONObject jsonObject) {
-            //Log.d("voice detection", "the json object is " + jsonObject.toString());
-        }
+        public void onVoiceDetect(JSONObject jsonObject) { }
 
         @Override
-        public void onSpeakComplete(String s, String s1) {
-            //Log.d("RobotDevSample", "speak Complete");
-        }
+        public void onSpeakComplete(String s, String s1) { }
 
         @Override
         public void onEventUserUtterance(JSONObject jsonObject) {

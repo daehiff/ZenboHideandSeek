@@ -34,8 +34,11 @@ public class HideAndSeek extends RobotActivity {
     public static TextView statusText;
     public Context context = this;
 
+    private static int errorCount = 0;
+
     // request code for READ_CONTACTS. It can be any number > 0.
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    private static final int ERROR_THRESHOLD = 5;
 
     public HideAndSeek(RobotCallback robotCallback, RobotCallback.Listen robotListenCallback) {
         super(robotCallback, robotListenCallback);
@@ -85,7 +88,7 @@ public class HideAndSeek extends RobotActivity {
                 @Override
                 public void onClick(View view) {
                 seeking.stop();
-                statusText.setText("Stopped detections");
+                statusText.setText("Stopped");
                 }
             });
 
@@ -98,6 +101,7 @@ public class HideAndSeek extends RobotActivity {
             }
         });
 
+        // TODO: This needs to be gone @Sulwen
         findViewById(R.id.user_yes).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,23 +143,26 @@ public class HideAndSeek extends RobotActivity {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
             super.onResult(cmd, serial, err_code, result);
-//            Log.d("RobotDevSample", "onResult:"
-//                    + RobotCommand.getRobotCommand(cmd).name()
-//                    + ", serial:" + serial + ", err_code:" + err_code
-//                    + ", result:" + result.getString("RESULT"));
         }
 
         @Override
         public void onStateChange(int cmd, int serial, RobotErrorCode err_code, RobotCmdState state) {
             super.onStateChange(cmd, serial, err_code, state);
-            // 41 = a to b
-            if (cmd == 41 && state == RobotCmdState.SUCCEED) {
+            statusText.setText(seeking.state.toString());
+
+            if (cmd == RobotCommand.MOTION_GO_FROM_A_TO_B.getValue() && state == RobotCmdState.SUCCEED) {
                 // keep going
                 navigation.continueSearch();
             } else if (state == RobotCmdState.ACTIVE) {
                 // do nothing
             } else if (state == RobotCmdState.FAILED) {
-                // do some error handling
+                errorCount++;
+                if (errorCount > ERROR_THRESHOLD) {
+                    robotAPI.robot.speak("Oops I'm stuck.");
+                    navigation.stopAllMovement();
+                } else {
+                    navigation.continueSearch();
+                }
             }
         }
 

@@ -8,7 +8,12 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/RobotActivityLibrary" />
+            <option value="$PROJECT_DIR$/RobotDevSample" />
+            <option value="$PROJECT_DIR$/RobotSensorSample" />
+            <option value="$PROJECT_DIR$/ZenboDialogSample" />
+            <option value="$PROJECT_DIR$/ZenboGoToLocation" />
+            <option value="$PROJECT_DIR$/ZenboHelloWorld" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

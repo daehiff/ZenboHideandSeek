@@ -1,22 +1,19 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import com.asus.robotdevsample.R;
+import com.asus.hideandseek.R;
 import com.asus.robotframework.API.RobotAPI;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotCommand;
 import com.asus.robotframework.API.RobotErrorCode;
 import com.asus.robotframework.API.RobotFace;
-import com.asus.robotframework.API.SpeakConfig;
 import com.asus.robotframework.API.WheelLights;
 import com.robot.asus.robotactivity.RobotActivity;
 import com.asus.robotframework.API.results.DetectFaceResult;
@@ -26,11 +23,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import static android.content.ContentValues.TAG;
-import static java.sql.DriverManager.println;
-
 public class HideAndSeek extends RobotActivity {
-
     public RobotAPI robotAPI;
     public static Seeking seeking;
     public static Speaking speaking;
@@ -56,8 +49,8 @@ public class HideAndSeek extends RobotActivity {
         robotAPI.robot.setExpression(RobotFace.HIDEFACE);
 
         // Intialize behaviours
-        seeking = new Seeking(robotAPI);
         speaking = new Speaking(robotAPI);
+        seeking = new Seeking(robotAPI, speaking);
 
         // Turn off his wheels
         robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xfffffff);

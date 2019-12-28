@@ -1,4 +1,4 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,10 +15,11 @@ import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
-public class VisionActivity extends RobotActivity {
+public class MotionActivity extends RobotActivity {
     private ListView listView;
     private String[] listViewitems;
     private ArrayAdapter listAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,12 +28,14 @@ public class VisionActivity extends RobotActivity {
 
         //title
         TextView mTextViewTitle = (TextView)findViewById(R.id.textview_title);
-        mTextViewTitle.setText(getString(R.string.toolbar_title_subclass_vision_title));
+        mTextViewTitle.setText(getString(R.string.toolbar_title_subclass_motion_title));
 
-        listViewitems = getResources().getStringArray(R.array.subclasses_vision);
+
+        listViewitems = getResources().getStringArray(R.array.subclasses_motion);
         listView = (ListView)findViewById(R.id.list_view);
         listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listViewitems);
         listView.setAdapter(listAdapter);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -40,25 +43,20 @@ public class VisionActivity extends RobotActivity {
                 Intent subExample;
                 switch(position) {
                     case 0:
-                        //. requestDetectPerson & cancelDetectPerson
-                        subExample = new Intent(VisionActivity.this, VisionRequestDetectPerson.class);
+                        //.moveBody & moveHead
+                        subExample = new Intent(MotionActivity.this, MotionMoveBodyHead.class);
                         startActivity(subExample);
                         break;
-
-
                     case 1:
-                        //. requestDetectFace & cancelDetectFace
-                        subExample = new Intent(VisionActivity.this, VisionRequestDetectFace.class);
+                        //.remoteControlBody & remoteControlHead
+                        subExample = new Intent(MotionActivity.this, MotionRemoteControlBodyHead.class);
                         startActivity(subExample);
+                        break;
                 }
-
             }
         });
 
-
     }
-
-
 
 
     public static RobotCallback robotCallback = new RobotCallback() {
@@ -114,7 +112,7 @@ public class VisionActivity extends RobotActivity {
 
 
 
-    public VisionActivity() {
+    public MotionActivity() {
         super(robotCallback, robotListenCallback);
     }
 

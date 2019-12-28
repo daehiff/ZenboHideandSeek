@@ -1,4 +1,4 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 import android.content.Intent;
 import android.os.Bundle;

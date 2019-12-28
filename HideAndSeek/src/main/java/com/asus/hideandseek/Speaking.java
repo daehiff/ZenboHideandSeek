@@ -1,29 +1,30 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 import android.util.Log;
 
 import com.asus.robotframework.API.RobotAPI;
-import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.SpeakConfig;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import kotlin.jvm.internal.markers.KMutableList;
-
-import static com.asus.robotdevsample.Seeking.SeekingState.ASKING_TO_PLAY;
-import static com.asus.robotdevsample.Seeking.SeekingState.*;
 
 public class Speaking {
     private RobotAPI robotAPI;
-    public final String DOMAIN = "85848A87233A4268AE9E6DBE15A73273";
+    private SpeakConfig config = new SpeakConfig();
 
     public Speaking(RobotAPI robotAPI) {
         this.robotAPI = robotAPI;
-        robotAPI.robot.jumpToPlan(DOMAIN, "lanuchHelloWolrd_Plan");
+
+        config.timeout(10f);
+        config.listenCurrentDomain(true);
+    }
+
+    public void askForPlay() {
+        robotAPI.robot.stopSpeakAndListen();
+        robotAPI.robot.speakAndListen("Do you want to play hide and seek with me?",
+                config);
     }
 
     public void handleUserConversation(Seeking seeking, JSONObject jsonObject){
@@ -32,18 +33,18 @@ public class Speaking {
                 case ASKING_TO_PLAY:
                     String currentUserUtterance = jsonObject.getJSONObject("event_user_utterance").getString("user_utterance");
                     if (currentUserUtterance.contains("yes")) {
-                        Log.d("userUtteranceContainYes", "It contains Yes");
+                        Log.d("HideAndSeek", "User answer contains Yes");
                         this.robotAPI.robot.stopSpeakAndListen();
                         seeking.startLookingForTarget();
                     } else {
-                        Log.d("userUtteranceContains", "It doesn't contain yes");
+                        Log.d("HideAndSeek", "User answer doesn't contain yes");
                         break;
                     }
                     break;
 
                     default:
-                        Log.d("Not asking to play", "Not asking to play");
-                        break;
+                        Log.d("HideAndSeek", "Not asking to play");
+                    break;
             }
         } catch (JSONException e) {
             e.printStackTrace();

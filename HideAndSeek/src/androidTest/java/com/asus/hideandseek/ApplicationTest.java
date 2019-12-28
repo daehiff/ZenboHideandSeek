@@ -1,4 +1,4 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

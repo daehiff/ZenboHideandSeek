@@ -1,14 +1,11 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.asus.robotframework.API.MotionControl.Direction;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotCommand;
@@ -17,55 +14,77 @@ import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
-public class UtilityPlayAction extends RobotActivity {
 
-    private Button btn_start;
-    private Button btn_stop;
+public class MotionRemoteControlBodyHead extends RobotActivity {
 
-    private EditText mEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_utility_playaction);
+        setContentView(R.layout.layout_motion_remotecontrolbodyhead);
 
         //title
         TextView mTextViewTitle = (TextView)findViewById(R.id.textview_title);
-        mTextViewTitle.setText(getString(R.string.utility_playAction_full));
-
-        //hide ime
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
-
-        btn_start = (Button) findViewById(R.id.btn_actionsetstart);
-        btn_stop = (Button) findViewById(R.id.btn_actionsetstop);
-        mEditText = (EditText) findViewById(R.id.actionset_edittext);
-        mEditText.setText("22");      //#22 action
-
-        btn_start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-
-                if(mEditText.getText().length() > 0) {
-                    int iCuttentNumberPickerValue = Integer.parseInt(mEditText.getText().toString());
-                    robotAPI.utility.playAction(iCuttentNumberPickerValue);
-                    Toast.makeText(arg0.getContext(), "Start Action #ID = " + iCuttentNumberPickerValue, Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-
-
-        btn_stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-
-                robotAPI.cancelCommand(RobotCommand.MOTION_PLAY_ACTION.getValue());
-            }
-        });
-
+        mTextViewTitle.setText(getString(R.string.toolbar_title_subclass_motion_title));
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+    }
+
+    public void buttonBodyForwardClicked(View view) {
+        robotAPI.motion.remoteControlBody(Direction.Body.FORWARD);
+    }
+
+    public void buttonBodyBackwardClicked(View view) {
+        robotAPI.motion.remoteControlBody(Direction.Body.BACKWARD);
+    }
+
+    public void buttonBodyRightClicked(View view) {
+        robotAPI.motion.remoteControlBody(Direction.Body.TURN_RIGHT);
+    }
+
+    public void buttonBodyLeftClicked(View view) {
+        robotAPI.motion.remoteControlBody(Direction.Body.TURN_LEFT);
+    }
+
+    public void buttonBodyStopClicked(View view) {
+        robotAPI.motion.remoteControlBody(Direction.Body.STOP);
+    }
+
+    public void neckHeadUpClicked(View view) {
+        robotAPI.motion.remoteControlHead(Direction.Head.UP);
+    }
+
+    public void neckHeadDownClicked(View view) {
+        robotAPI.motion.remoteControlHead(Direction.Head.DOWN);
+    }
+
+    public void neckHeadRightClicked(View view) {
+        robotAPI.motion.remoteControlHead(Direction.Head.RIGHT);
+    }
+
+    public void neckHeadLeftClicked(View view) {
+        robotAPI.motion.remoteControlHead(Direction.Head.LEFT);
+    }
+
+    public void neckHeadStopClicked(View view) {
+        robotAPI.motion.remoteControlHead(Direction.Head.STOP);
+    }
+
 
 
 
@@ -95,7 +114,6 @@ public class UtilityPlayAction extends RobotActivity {
 
         }
     };
-
 
     public static RobotCallback.Listen robotListenCallback = new RobotCallback.Listen() {
         @Override
@@ -130,7 +148,7 @@ public class UtilityPlayAction extends RobotActivity {
     };
 
 
-    public UtilityPlayAction() {
+    public MotionRemoteControlBodyHead() {
         super(robotCallback, robotListenCallback);
     }
 }

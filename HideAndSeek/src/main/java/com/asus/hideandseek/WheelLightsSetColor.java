@@ -1,4 +1,4 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 
 import android.os.Bundle;
@@ -20,73 +20,70 @@ import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
-public class WheelLightsSetBrightness extends RobotActivity {
-
+public class WheelLightsSetColor extends RobotActivity {
     private EditText EditText_active;
-    private EditText EditText_bright;
+    private EditText EditText_color;
 
     private Spinner mSpinner;
     private ArrayAdapter<String> SpinnerList;
     private String[] wheelLightsID = {"SYNC_BOTH", "ASYNC_LEFT", "ASYNC_RIGHT"};
 
 
-    private Button setBrightness;
+    private Button SetColor;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_wheellights_setbrightness);
+        setContentView(R.layout.layout_wheellights_setcolor);
 
         //title
         TextView mTextViewTitle = (TextView)findViewById(R.id.textview_title);
-        mTextViewTitle.setText(getString(R.string.wheelLights_setBrightness_full));
+        mTextViewTitle.setText(getString(R.string.wheelLights_setColor_full));
 
         //IME hide
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         //Spinner of wheel lights ID
         mSpinner = (Spinner)findViewById(R.id.wheellights_spinner_lights_id);
-        SpinnerList = new ArrayAdapter<String>(WheelLightsSetBrightness.this, android.R.layout.simple_spinner_item, wheelLightsID);
+        SpinnerList = new ArrayAdapter<String>(WheelLightsSetColor.this, android.R.layout.simple_spinner_item, wheelLightsID);
         mSpinner.setAdapter(SpinnerList);
 
         //Edittext
-        EditText_active = (EditText) findViewById(R.id.setbright_edittext_active);
+        EditText_active = (EditText) findViewById(R.id.setcolor_edittext_active);
         EditText_active.setText("0xff");
 
-        EditText_bright= (EditText) findViewById(R.id.setbright_edittext_bright);
-        EditText_bright.setText("25");
+        EditText_color= (EditText) findViewById(R.id.setcolor_edittext_bright);
+        EditText_color.setText("0xFF0000");
 
 
-        setBrightness = (Button) findViewById(R.id.wheellight_button_setbrightness);
+        //Button
+        SetColor = (Button) findViewById(R.id.wheellight_button_setcolor);
 
-        setBrightness.setOnClickListener(new Button.OnClickListener() {
+        SetColor.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String active = EditText_active.getText().toString();
-                int bright = Integer.parseInt(EditText_bright.getText().toString());
+                int color = Integer.decode(EditText_color.getText().toString());
                 String SpinnerText = mSpinner.getSelectedItem().toString();
 
                 if(SpinnerText.equals("SYNC_BOTH")){
-                    robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xff);
-                    robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0xFFFFFF);
-                    robotAPI.wheelLights.setBrightness(WheelLights.Lights.SYNC_BOTH, 0xff, bright);
+                    robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, color);
                 }
                 else if(SpinnerText.equals("ASYNC_LEFT")){
-                    robotAPI.wheelLights.turnOff(WheelLights.Lights.ASYNC_LEFT, 0xff);
-                    robotAPI.wheelLights.setColor(WheelLights.Lights.ASYNC_LEFT, 0xff, 0xFFFFFF);
-                    robotAPI.wheelLights.setBrightness(WheelLights.Lights.ASYNC_LEFT, 0xff, bright);
+                    robotAPI.wheelLights.setColor(WheelLights.Lights.ASYNC_LEFT, 0xff, color);
                 }
                 else if(SpinnerText.equals("ASYNC_RIGHT")){
-                    robotAPI.wheelLights.turnOff(WheelLights.Lights.ASYNC_RIGHT, 0xff);
-                    robotAPI.wheelLights.setColor(WheelLights.Lights.ASYNC_RIGHT, 0xff, 0xFFFFFF);
-                    robotAPI.wheelLights.setBrightness(WheelLights.Lights.ASYNC_RIGHT, 0xff, bright);
+                    robotAPI.wheelLights.setColor(WheelLights.Lights.ASYNC_RIGHT, 0xff, color);
                 }
 
             }
         });
 
     }
+
+
+
 
 
 
@@ -148,7 +145,7 @@ public class WheelLightsSetBrightness extends RobotActivity {
 
 
 
-    public WheelLightsSetBrightness() {
+    public WheelLightsSetColor() {
         super(robotCallback, robotListenCallback);
     }
 }

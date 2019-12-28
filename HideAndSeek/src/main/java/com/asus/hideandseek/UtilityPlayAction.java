@@ -1,4 +1,4 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +7,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
@@ -16,42 +17,58 @@ import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
-public class RobotSpeak extends RobotActivity {
-    private Button btn_start_speak, btn_stop_speak;
-    private EditText mEdit;
+public class UtilityPlayAction extends RobotActivity {
+
+    private Button btn_start;
+    private Button btn_stop;
+
+    private EditText mEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_robot_speak);
+        setContentView(R.layout.layout_utility_playaction);
 
         //title
         TextView mTextViewTitle = (TextView)findViewById(R.id.textview_title);
-        mTextViewTitle.setText(getString(R.string.toolbar_title_subclass_robot_title));
+        mTextViewTitle.setText(getString(R.string.utility_playAction_full));
 
-        //ime hide
+        //hide ime
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        btn_start_speak = (Button)findViewById(R.id.btn_speak_start);
-        btn_stop_speak = (Button)findViewById(R.id.btn_speak_stop);
 
-        mEdit = (EditText)findViewById(R.id.speak_edittext);
+        btn_start = (Button) findViewById(R.id.btn_actionsetstart);
+        btn_stop = (Button) findViewById(R.id.btn_actionsetstop);
+        mEditText = (EditText) findViewById(R.id.actionset_edittext);
+        mEditText.setText("22");      //#22 action
 
-        btn_start_speak.setOnClickListener(new Button.OnClickListener(){
+        btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                robotAPI.robot.speak(mEdit.getText().toString());
+            public void onClick(View arg0) {
+
+                if(mEditText.getText().length() > 0) {
+                    int iCuttentNumberPickerValue = Integer.parseInt(mEditText.getText().toString());
+                    robotAPI.utility.playAction(iCuttentNumberPickerValue);
+                    Toast.makeText(arg0.getContext(), "Start Action #ID = " + iCuttentNumberPickerValue, Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
-        btn_stop_speak.setOnClickListener(new Button.OnClickListener(){
+
+        btn_stop.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                robotAPI.robot.stopSpeak();
+            public void onClick(View arg0) {
+
+                robotAPI.cancelCommand(RobotCommand.MOTION_PLAY_ACTION.getValue());
             }
         });
+
 
     }
+
+
+
 
 
 
@@ -60,6 +77,7 @@ public class RobotSpeak extends RobotActivity {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
             super.onResult(cmd, serial, err_code, result);
+
             Log.d("RobotDevSample", "onResult:"
                     + RobotCommand.getRobotCommand(cmd).name()
                     + ", serial:" + serial + ", err_code:" + err_code
@@ -78,6 +96,7 @@ public class RobotSpeak extends RobotActivity {
         }
     };
 
+
     public static RobotCallback.Listen robotListenCallback = new RobotCallback.Listen() {
         @Override
         public void onFinishRegister() {
@@ -91,7 +110,7 @@ public class RobotSpeak extends RobotActivity {
 
         @Override
         public void onSpeakComplete(String s, String s1) {
-            Log.d("RobotDevSample", "speak Complete");
+
         }
 
         @Override
@@ -101,6 +120,7 @@ public class RobotSpeak extends RobotActivity {
 
         @Override
         public void onResult(JSONObject jsonObject) {
+
         }
 
         @Override
@@ -109,8 +129,8 @@ public class RobotSpeak extends RobotActivity {
         }
     };
 
-    public RobotSpeak() {
+
+    public UtilityPlayAction() {
         super(robotCallback, robotListenCallback);
     }
-
 }

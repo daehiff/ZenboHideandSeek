@@ -1,4 +1,4 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,13 +11,15 @@ import android.widget.TextView;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
+import com.asus.robotframework.API.RobotFace;
 
 import org.json.JSONObject;
 
-public class RobotActivity extends com.robot.asus.robotactivity.RobotActivity {
+public class RobotDevSampleActivity extends com.robot.asus.robotactivity.RobotActivity {
     private ListView listView;
     private String[] listViewitems;
     private ArrayAdapter listAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +28,10 @@ public class RobotActivity extends com.robot.asus.robotactivity.RobotActivity {
 
         //title
         TextView mTextViewTitle = (TextView)findViewById(R.id.textview_title);
-        mTextViewTitle.setText(getString(R.string.toolbar_title_subclass_robot_title));
+        mTextViewTitle.setText(getString(R.string.toolbar_title_mainclass_robotapi_title));
 
-        listViewitems = getResources().getStringArray(R.array.subclasses_robot);
         listView = (ListView)findViewById(R.id.list_view);
+        listViewitems = getResources().getStringArray(R.array.subclasses_type);
         listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listViewitems);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -39,18 +41,45 @@ public class RobotActivity extends com.robot.asus.robotactivity.RobotActivity {
                 Intent subExample;
                 switch(position) {
                     case 0:
-                        //.speak & stopSpeak
-                        subExample = new Intent(RobotActivity.this, HideAndSeek.class);
+                        //.motion
+                        subExample = new Intent(RobotDevSampleActivity.this, MotionActivity.class);
                         startActivity(subExample);
                         break;
                     case 1:
-                        //.setExpression
-                        subExample = new Intent(RobotActivity.this, RobotSetExpression.class);
+                        //.robot
+                        subExample = new Intent(RobotDevSampleActivity.this, RobotActivity.class);
+                        startActivity(subExample);
+                        break;
+                    case 2:
+                        //.utility
+                        subExample = new Intent(RobotDevSampleActivity.this, UtilityActivity.class);
+                        startActivity(subExample);
+                        break;
+                    case 3:
+                        //.vision
+                        subExample = new Intent(RobotDevSampleActivity.this, VisionActivity.class);
+                        startActivity(subExample);
+                        break;
+                    case 4:
+                        //.wheellight
+                        subExample = new Intent(RobotDevSampleActivity.this, WheelLightsActivity.class);
                         startActivity(subExample);
                         break;
                 }
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //hide expression
+        robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+    }
+
+    public RobotDevSampleActivity() {
+        super(robotCallback, robotListenCallback);
     }
 
     public static RobotCallback robotCallback = new RobotCallback() {
@@ -103,9 +132,4 @@ public class RobotActivity extends com.robot.asus.robotactivity.RobotActivity {
 
         }
     };
-
-    public RobotActivity() {
-        super(robotCallback, robotListenCallback);
-    }
-
 }

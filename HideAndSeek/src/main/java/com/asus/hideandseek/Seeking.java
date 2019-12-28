@@ -1,6 +1,7 @@
-package com.asus.robotdevsample;
+package com.asus.hideandseek;
 
 import android.util.Log;
+import java.util.List;
 
 import com.asus.robotframework.API.RobotAPI;
 import com.asus.robotframework.API.SpeakConfig;
@@ -9,19 +10,15 @@ import com.asus.robotframework.API.WheelLights;
 import com.asus.robotframework.API.results.DetectFaceResult;
 import com.asus.robotframework.API.results.DetectPersonResult;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static com.asus.robotdevsample.Seeking.SeekingState.ASKING_TO_PLAY;
+import static com.asus.hideandseek.Seeking.SeekingState.ASKING_TO_PLAY;
 import static java.sql.DriverManager.println;
 
 public class Seeking {
-
-    public final String DOMAIN = "85848A87233A4268AE9E6DBE15A73273";
-    public RobotAPI robotAPI;
     public String userId = null;
-    private int findCount = 0;
 
+    private int findCount = 0;
+    private RobotAPI robotAPI;
+    private Speaking speaking;
 
     public enum SeekingState {
         NOT_STARTED, SEARCHING_FOR_TARGET, ASKING_TO_PLAY, COUNTDOWN, SEEKING
@@ -36,9 +33,10 @@ public class Seeking {
     public VisionConfig.PersonDetectConfig detectPersonConfig = new VisionConfig.PersonDetectConfig();
     public VisionConfig.FaceDetectConfig detectFaceConfig = new VisionConfig.FaceDetectConfig();
 
-    Seeking(RobotAPI robotAPI){
+    Seeking(RobotAPI robotAPI, Speaking speaking) {
         // Set-up the vision detections parameters
         this.robotAPI = robotAPI;
+        this.speaking = speaking;
         detectPersonConfig.interval = 3;
         detectFaceConfig.interval = 3;
         detectPersonConfig.enableDebugPreview = debugMode;
@@ -54,15 +52,8 @@ public class Seeking {
                     robotAPI.robot.speak("There are too many of you!");
                     blinkAllLights(0x00ff0000, 5, 20);
                 } else if (people.size() == 1) {
-                    SpeakConfig speakingConfig = new SpeakConfig();
-                    speakingConfig.domain(DOMAIN);
-                    speakingConfig.timeout(10f);
-                    speakingConfig.listenCurrentDomain(true);
-
                     state = ASKING_TO_PLAY;
-                    robotAPI.robot.stopSpeakAndListen();
-                    robotAPI.robot.speakAndListen("Do you want to play hide and seek with me?",
-                            speakingConfig);
+                    speaking.askForPlay();
                 }
                 break;
 
@@ -105,15 +96,8 @@ public class Seeking {
                     robotAPI.robot.speak("There are too many of you!");
                     blinkAllLights(0x00ff0000, 5, 20);
                 } else if (people.size() == 1) {
-                    SpeakConfig speakingConfig = new SpeakConfig();
-                    speakingConfig.domain(DOMAIN);
-                    speakingConfig.timeout(10f);
-                    speakingConfig.listenCurrentDomain(true);
-
                     state = ASKING_TO_PLAY;
-                    robotAPI.robot.stopSpeakAndListen();
-                    robotAPI.robot.speakAndListen("Do you want to play hide and seek with me?",
-                            speakingConfig);
+                    speaking.askForPlay();
                 }
                 break;
 

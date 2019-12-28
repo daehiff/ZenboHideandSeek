@@ -1,5 +1,4 @@
-package com.asus.robotdevsample;
-
+package com.asus.hideandseek;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,11 +11,10 @@ import android.widget.TextView;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
-import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
-public class UtilityActivity extends RobotActivity {
+public class RobotActivity extends com.robot.asus.robotactivity.RobotActivity {
     private ListView listView;
     private String[] listViewitems;
     private ArrayAdapter listAdapter;
@@ -28,11 +26,10 @@ public class UtilityActivity extends RobotActivity {
 
         //title
         TextView mTextViewTitle = (TextView)findViewById(R.id.textview_title);
-        mTextViewTitle.setText(getString(R.string.toolbar_title_subclass_utility_title));
+        mTextViewTitle.setText(getString(R.string.toolbar_title_subclass_robot_title));
 
-
-        listViewitems = getResources().getStringArray(R.array.subclasses_utility);
-        listView = (ListView) findViewById(R.id.list_view);
+        listViewitems = getResources().getStringArray(R.array.subclasses_robot);
+        listView = (ListView)findViewById(R.id.list_view);
         listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listViewitems);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -40,26 +37,21 @@ public class UtilityActivity extends RobotActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Intent subExample;
-                switch (position) {
+                switch(position) {
                     case 0:
-                        //.playAction
-                        subExample = new Intent(UtilityActivity.this, UtilityPlayAction.class);
+                        //.speak & stopSpeak
+                        subExample = new Intent(RobotActivity.this, HideAndSeek.class);
                         startActivity(subExample);
                         break;
                     case 1:
-                        //.playEmotionalAction
-                        subExample = new Intent(UtilityActivity.this, UtilityPlayEmotionalAction.class);
+                        //.setExpression
+                        subExample = new Intent(RobotActivity.this, RobotSetExpression.class);
                         startActivity(subExample);
                         break;
                 }
-
-
             }
         });
-
     }
-
-
 
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
@@ -78,6 +70,7 @@ public class UtilityActivity extends RobotActivity {
 
         }
     };
+
 
     public static RobotCallback.Listen robotListenCallback = new RobotCallback.Listen() {
         @Override
@@ -111,8 +104,7 @@ public class UtilityActivity extends RobotActivity {
         }
     };
 
-
-    public UtilityActivity() {
+    public RobotActivity() {
         super(robotCallback, robotListenCallback);
     }
 

@@ -8,8 +8,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/HideAndSeek" />
             <option value="$PROJECT_DIR$/RobotActivityLibrary" />
-            <option value="$PROJECT_DIR$/RobotDevSample" />
             <option value="$PROJECT_DIR$/RobotSensorSample" />
             <option value="$PROJECT_DIR$/ZenboDialogSample" />
             <option value="$PROJECT_DIR$/ZenboGoToLocation" />

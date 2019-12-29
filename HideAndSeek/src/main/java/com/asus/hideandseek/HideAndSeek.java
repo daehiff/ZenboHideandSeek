@@ -36,6 +36,12 @@ public class HideAndSeek extends RobotActivity {
     public Context context = this;
 
     private static int errorCount = 0;
+    private static int bodyMoved = 0;
+    private static boolean moveHeadLeft = true;
+    public enum NavigationState {
+        NOT_STARTED, A_TO_B, MOVE_HEAD_LEFT, MOVE_HEAD_RIGHT, MOVE_HEAD_CENTER, MOVE_BODY
+    }
+    public static NavigationState navigationState = NavigationState.NOT_STARTED;
 
     // request code for READ_CONTACTS. It can be any number > 0.
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
@@ -84,6 +90,12 @@ public class HideAndSeek extends RobotActivity {
         robotAPI.robot.stopSpeakAndListen();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        seeking.stop();
+    }
+
     public static RobotCallback robotCallback = new RobotCallback() {
 
         @Override
@@ -103,6 +115,9 @@ public class HideAndSeek extends RobotActivity {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
             super.onResult(cmd, serial, err_code, result);
+            if (cmd == RobotCommand.MOTION_MOVE_BODY.getValue()) {
+                navigation.continueSearch();
+            }
         }
 
         @Override
@@ -110,18 +125,41 @@ public class HideAndSeek extends RobotActivity {
             super.onStateChange(cmd, serial, err_code, state);
             statusText.setText(seeking.state.toString());
 
-            if (cmd == RobotCommand.MOTION_GO_FROM_A_TO_B.getValue() && state == RobotCmdState.SUCCEED) {
-                // keep going
-                navigation.continueSearch();
-            } else if (state == RobotCmdState.ACTIVE) {
-                // do nothing
-            } else if (state == RobotCmdState.FAILED) {
+            if (cmd == RobotCommand.MOTION_GO_FROM_A_TO_B.getValue() && state == RobotCmdState.FAILED) {
                 errorCount++;
                 if (errorCount > ERROR_THRESHOLD) {
                     robotAPI.robot.speak("Oops I'm stuck.");
                     navigation.stopAllMovement();
-                } else {
-                    navigation.continueSearch();
+                }
+            }
+
+            if (state == RobotCmdState.SUCCEED) {
+                if (cmd == RobotCommand.MOTION_GO_FROM_A_TO_B.getValue() && navigationState == NavigationState.A_TO_B) {
+                    Log.d("Movement", "MOVE HEAD LEFT");
+                    navigationState = NavigationState.MOVE_HEAD_LEFT;
+                    navigation.moveHeadLeft();
+                } else if (cmd == RobotCommand.MOVE_HEAD.getValue() && navigationState == NavigationState.MOVE_HEAD_LEFT) {
+                    Log.d("Movement", "MOVE HEAD RIGHT");
+                    navigationState = NavigationState.MOVE_HEAD_RIGHT;
+                    navigation.moveHeadRight();
+                } else if (cmd == RobotCommand.MOVE_HEAD.getValue() && navigationState == NavigationState.MOVE_HEAD_RIGHT) {
+                    Log.d("Movement", "MOVE HEAD CENTER");
+                    navigationState = NavigationState.MOVE_HEAD_CENTER;
+                    navigation.moveHeadCenter();
+                } else if (cmd == RobotCommand.MOVE_HEAD.getValue() && navigationState == NavigationState.MOVE_HEAD_CENTER) {
+                    if (bodyMoved == 0) {
+                        Log.d("Movement", "MOVE BODY FOR THE 0TH TIME");
+                        bodyMoved = 1;
+                        navigationState = NavigationState.MOVE_BODY;
+                        navigation.moveBody();
+                    } else {
+                        Log.d("Movement", "MOVE BODY FOR THE 1ST TIME");
+                        bodyMoved = 0;
+                        navigation.continueSearch();
+                    }
+                } else if (cmd == RobotCommand.MOTION_MOVE_BODY.getValue() && navigationState == NavigationState.MOVE_BODY) {
+                    navigation.moveHeadLeft();
+                    navigationState = NavigationState.MOVE_HEAD_LEFT;
                 }
             }
         }

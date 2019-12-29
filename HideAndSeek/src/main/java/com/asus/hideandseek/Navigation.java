@@ -1,7 +1,9 @@
 package com.asus.hideandseek;
 
+import android.os.CountDownTimer;
 import android.util.Log;
 
+import com.asus.robotframework.API.MotionControl;
 import com.asus.robotframework.API.results.Location;
 import com.asus.robotframework.API.results.RoomInfo;
 
@@ -59,6 +61,49 @@ public class Navigation {
         return adjacentPoints;
     }
 
+    public static void pause() {
+        new CountDownTimer(2000, 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                // do something after 1s
+            }
+
+            @Override
+            public void onFinish() {
+                // do something end times 5s
+            }
+
+        }.start();
+    }
+
+    public static void moveBody() {
+        MotionControl.SpeedLevel.Body bodyLevel = MotionControl.SpeedLevel.Body.L1;
+        HideAndSeek.robotAPI.motion.moveBody(0, 0, (float) (-1.0 * (Math.PI)), bodyLevel);
+    }
+
+    public static void moveHeadLeft() {
+        float yaw = (float) (Math.toRadians(Float.valueOf(30)));
+        float pitch = (float) (Math.toRadians(Float.valueOf(10)));
+        MotionControl.SpeedLevel.Head headLevel = MotionControl.SpeedLevel.Head.L1;
+        HideAndSeek.robotAPI.motion.moveHead(yaw, pitch, headLevel);
+        pause();
+    }
+    public static void moveHeadRight() {
+        float yaw = (float) (Math.toRadians(Float.valueOf(-30)));
+        float pitch = (float) (Math.toRadians(Float.valueOf(10)));
+        MotionControl.SpeedLevel.Head headLevel = MotionControl.SpeedLevel.Head.L1;
+        HideAndSeek.robotAPI.motion.moveHead(yaw, pitch, headLevel);
+        pause();
+    }
+
+    public static void moveHeadCenter() {
+        float pitch = (float) (Math.toRadians(Float.valueOf(10)));
+        MotionControl.SpeedLevel.Head headLevel = MotionControl.SpeedLevel.Head.L1;
+        HideAndSeek.robotAPI.motion.moveHead(0, pitch, headLevel);
+        pause();
+    }
+
     public static void goToLocation(IntPoint point) {
         Location location = new Location();
         location.coordinate.x = (float) point.x;
@@ -88,7 +133,7 @@ public class Navigation {
 
         // if the point is not discovered, then check for the person, then add its neighbors
         if (visited.get(currPt) == Boolean.FALSE) {
-            // @TODO implement logic for finding the person
+            HideAndSeek.navigationState = HideAndSeek.NavigationState.A_TO_B;
             goToLocation(currPt);
 
             visited.put(currPt, Boolean.TRUE);
@@ -128,7 +173,7 @@ public class Navigation {
         if (stack.size() > 0) {
             // if the point is not discovered, then check for the person, then add its neighbors
             if (visited.get(currPt) == Boolean.FALSE) {
-                // @TODO implement logic for finding the person
+                HideAndSeek.navigationState = HideAndSeek.NavigationState.A_TO_B;
                 goToLocation(currPt);
 
                 Log.d("ZenboGoToLocation", "Marking point as visited: " + currPt.x + " " + currPt.y);

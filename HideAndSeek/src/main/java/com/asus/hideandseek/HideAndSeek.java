@@ -17,6 +17,7 @@ import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotCommand;
 import com.asus.robotframework.API.RobotErrorCode;
 import com.asus.robotframework.API.RobotFace;
+import com.asus.robotframework.API.SpeakConfig;
 import com.asus.robotframework.API.WheelLights;
 import com.robot.asus.robotactivity.RobotActivity;
 import com.asus.robotframework.API.results.DetectFaceResult;
@@ -61,6 +62,7 @@ public class HideAndSeek extends RobotActivity {
         speaking = new Speaking();
         navigation = new Navigation();
         seeking = new Seeking();
+        seeking.stop();
 
         // Turn off his wheels
         robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xff);
@@ -68,7 +70,7 @@ public class HideAndSeek extends RobotActivity {
         // Disable some of his behaviours
         robotAPI.robot.setVoiceTrigger(false);
         robotAPI.robot.setPressOnHeadAction(false);
-        
+        robotAPI.robot.speakAndListen("I am waiting for your command master", SpeakConfig.MODE_FOREVER);
         // Ask for contacts permission
         requestPermission();
 
@@ -122,6 +124,13 @@ public class HideAndSeek extends RobotActivity {
                 seeking.handleApology();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        seeking.stop();
+        robotAPI.robot.stopSpeakAndListen();
     }
 
     public static RobotCallback robotCallback = new RobotCallback() {

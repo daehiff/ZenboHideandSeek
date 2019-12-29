@@ -11,6 +11,8 @@ import com.asus.robotframework.API.WheelLights;
 import com.asus.robotframework.API.results.DetectFaceResult;
 import com.asus.robotframework.API.results.DetectPersonResult;
 
+import static com.asus.hideandseek.HideAndSeek.seeking;
+import static com.asus.hideandseek.HideAndSeek.statusText;
 import static com.asus.hideandseek.Seeking.SeekingState.ASKING_TO_PLAY;
 
 public class Seeking {
@@ -87,6 +89,8 @@ public class Seeking {
             if (denialCount < 2) {
 //                HideAndSeek.robotAPI.utility.playEmotionalAction(RobotFace.ACTIVE, Utility.PlayAction.Head_up_1);
                 HideAndSeek.robotAPI.robot.speak("Okay! Hide now, I'm counting until five.");
+                seeking.switchToPersonDetection();
+                statusText.setText(seeking.state.toString());
                 startCountdown(DEFAULT_COUNTDOWN_TIME);
             } else {
 //                robotAPI.utility.playEmotionalAction(RobotFace.SERIOUS, Utility.PlayAction.Head_up_1);

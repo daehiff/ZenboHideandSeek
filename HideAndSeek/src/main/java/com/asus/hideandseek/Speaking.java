@@ -10,6 +10,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static com.asus.hideandseek.HideAndSeek.robotAPI;
+import static com.asus.robotframework.API.SpeakConfig.MODE_DEFAULT;
+import static com.asus.robotframework.API.SpeakConfig.MODE_FOREVER;
+
 public class Speaking {
     private SpeakConfig config = new SpeakConfig();
 
@@ -20,32 +24,49 @@ public class Speaking {
 
     public void say(String sentence) {
         // TODO: THIS HASN'T BEEN FIXED YET!
-        HideAndSeek.robotAPI.robot.stopSpeakAndListen();
-        HideAndSeek.robotAPI.robot.speak(sentence);
+        robotAPI.robot.stopSpeakAndListen();
+        robotAPI.robot.speak(sentence);
     }
 
     public void askForPlay() {
         // TODO: Temporarily disabled until broken askForPlay() shit is fixed
-        HideAndSeek.robotAPI.robot.stopSpeakAndListen();
-        HideAndSeek.robotAPI.robot.speak("Do you want to play? Press the buttons to answer.");
+        robotAPI.robot.stopSpeakAndListen();
+        robotAPI.robot.speak("Do you want to play? Press the buttons to answer.");
 //        HideAndSeek.robotAPI.robot.speakAndListen("Do you want to play hide and seek with me?",
 //                config);
     }
 
     public void handleUserConversation(Seeking seeking, JSONObject jsonObject) {
+        String sentences = null;
+        try {
+            sentences = jsonObject.getJSONObject("event_user_utterance").getString("user_utterance");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         switch (seeking.state) {
             case ASKING_TO_PLAY:
-                ArrayList sentences = getUserSentences(jsonObject);
-
                 if (didUserSay(sentences, "yes")) {
                     seeking.handleUserAnswer(true);
                 } else if (didUserSay(sentences, "no")) {
                     seeking.handleUserAnswer(false);
                 } else if (didUserSay(sentences, "sorry")) {
                     seeking.handleApology();
-                } else {
-                    say("Sorry, I didn't understand you.");
-                    seeking.state = Seeking.SeekingState.SEARCHING_FOR_TARGET;
+                }else if (sentences.equals(null) || sentences.contains("ERROR")){
+                    robotAPI.robot.speakAndListen("", MODE_DEFAULT);
+                    break;
+                }/* else {
+                    seeking.state = Seeking.SeekingState.ASKING_TO_PLAY;
+                    robotAPI.robot.speakAndListen("Sorry, I didn't understand you, say yes or no", MODE_DEFAULT);
+                }*/
+                break;
+
+            case NOT_STARTED:
+                if (didUserSay(sentences, "play")) {
+                    robotAPI.robot.stopSpeakAndListen();
+                    robotAPI.robot.speakAndListen("Do you want to play hide and seek ?", SpeakConfig.MODE_TIMEOUT);
+                    seeking.state = Seeking.SeekingState.ASKING_TO_PLAY;
+                }else{
+                    robotAPI.robot.speakAndListen("I do not know this command", MODE_DEFAULT);
                 }
                 break;
 
@@ -79,16 +100,10 @@ public class Speaking {
         }
     }
 
-    public boolean didUserSay(ArrayList<String> sentences, String word){
-        for (int i=0;i<sentences.size();i++) {
-            if (sentences.get(i).contains(word)) {
+    public boolean didUserSay(String sentences, String word){
+            if (sentences.contains(word)) {
                 return true;
             }
-        }
         return false;
-    }
-
-    public boolean didUserSay(JSONObject userUtteranceEvent, String word) {
-        return didUserSay(getUserSentences(userUtteranceEvent), word);
     }
 }

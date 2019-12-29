@@ -65,7 +65,6 @@ public class Seeking {
                     robotAPI.robot.setExpression(RobotFace.SHOCKED);
                     blinkAllLights(0x00ff0000, 5, 20);
                 } else if (people.size() == 1) {
-                    state = ASKING_TO_PLAY;
                     robotAPI.robot.setExpression(RobotFace.CONFIDENT);
                     HideAndSeek.speaking.askForPlay();
                 }
@@ -73,12 +72,14 @@ public class Seeking {
 
             case SEEKING:
                 if (people.size() == 1) {
-                    if (people.get(0).getTrackConf() >= 1.0f) {
-                        HideAndSeek.robotAPI.robot.speak("Haha, I found you!");
-                        robotAPI.robot.setExpression(RobotFace.HAPPY);
-                        blinkAllLights(0x001111ff, 5, 50);
-                        stop();
-                    }
+                    String uuid = people.get(0).getUuid();
+                    String name = robotAPI.contacts.family.getName(uuid);
+                    boolean isValidName = name != null && uuid.charAt(0) != '-';
+                    String message = (isValidName ? "Hey " + name + "!" : "Hey you there!") + " I found you!";
+                    HideAndSeek.robotAPI.robot.speak(message);
+                    robotAPI.robot.setExpression(RobotFace.HAPPY);
+                    blinkAllLights(0x001111ff, 5, 50);
+                    stop();
                 }
                 state = SeekingState.NOT_STARTED;
                 break;
@@ -102,9 +103,8 @@ public class Seeking {
             blinkAllLights(0x0011ff00, 2, 10);
             if (denialCount < 2) {
 //                HideAndSeek.robotAPI.utility.playEmotionalAction(RobotFace.ACTIVE, Utility.PlayAction.Head_up_1);
-                HideAndSeek.robotAPI.robot.speak("Okay! Hide now, I'm counting until five.");
+                HideAndSeek.robotAPI.robot.speak("I'm counting until five.");
                 robotAPI.robot.setExpression(RobotFace.TIRED);
-                seeking.switchToPersonDetection();
                 statusText.setText(seeking.state.toString());
                 startCountdown(DEFAULT_COUNTDOWN_TIME);
             } else {
@@ -151,6 +151,7 @@ public class Seeking {
             countdownSeconds = 0;
             Point startPoint = new Point(11, 11);
             HideAndSeek.navigation.startSearchingRoom(startPoint);
+//            state = SEEKING;
         } else {
             delayHandler.postDelayed(repeatCountdown, 2000);
         }

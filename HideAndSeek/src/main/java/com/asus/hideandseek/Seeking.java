@@ -11,6 +11,7 @@ import com.asus.robotframework.API.WheelLights;
 import com.asus.robotframework.API.results.DetectFaceResult;
 import com.asus.robotframework.API.results.DetectPersonResult;
 
+import static com.asus.hideandseek.HideAndSeek.robotAPI;
 import static com.asus.hideandseek.HideAndSeek.seeking;
 import static com.asus.hideandseek.HideAndSeek.statusText;
 import static com.asus.hideandseek.Seeking.SeekingState.ASKING_TO_PLAY;
@@ -51,9 +52,11 @@ public class Seeking {
             case SEARCHING_FOR_TARGET:
                 if (people.size() > 1) {
                     HideAndSeek.speaking.say("There are too many of you!");
+                    robotAPI.robot.setExpression(RobotFace.SHOCKED);
                     blinkAllLights(0x00ff0000, 5, 20);
                 } else if (people.size() == 1) {
                     state = ASKING_TO_PLAY;
+                    robotAPI.robot.setExpression(RobotFace.CONFIDENT);
                     HideAndSeek.speaking.askForPlay();
                 }
                 break;
@@ -62,6 +65,7 @@ public class Seeking {
                 if (people.size() == 1) {
                     if (people.get(0).getTrackConf() >= 1.0f) {
                         HideAndSeek.robotAPI.robot.speak("Haha, I found you!");
+                        robotAPI.robot.setExpression(RobotFace.HAPPY);
                         blinkAllLights(0x001111ff, 5, 50);
                         stop();
                     }
@@ -89,12 +93,14 @@ public class Seeking {
             if (denialCount < 2) {
 //                HideAndSeek.robotAPI.utility.playEmotionalAction(RobotFace.ACTIVE, Utility.PlayAction.Head_up_1);
                 HideAndSeek.robotAPI.robot.speak("Okay! Hide now, I'm counting until five.");
+                robotAPI.robot.setExpression(RobotFace.TIRED);
                 seeking.switchToPersonDetection();
                 statusText.setText(seeking.state.toString());
                 startCountdown(DEFAULT_COUNTDOWN_TIME);
             } else {
 //                robotAPI.utility.playEmotionalAction(RobotFace.SERIOUS, Utility.PlayAction.Head_up_1);
                 HideAndSeek.robotAPI.robot.speak("Well good for you, but I don't want to play with you anymore now!");
+                robotAPI.robot.setExpression(RobotFace.PROUD);
                 state = SeekingState.NOT_STARTED;
             }
         } else {

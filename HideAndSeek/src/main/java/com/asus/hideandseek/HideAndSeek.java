@@ -56,7 +56,7 @@ public class HideAndSeek extends RobotActivity {
         robotAPI.robot.registerListenCallback(robotListenCallback);
 
         // Hide his face ( -!- important to see the UI )
-        robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+        robotAPI.robot.setExpression(RobotFace.ACTIVE);
 
         // Intialize behaviours
         speaking = new Speaking();
@@ -75,55 +75,6 @@ public class HideAndSeek extends RobotActivity {
         requestPermission();
 
         // Register actions to UI buttons for debugging
-        // TODO: Should be removed in the final version
-        Button startDetectionButton = findViewById(R.id.startdetection);
-            startDetectionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                seeking.switchToPersonDetection();
-                statusText.setText(seeking.state.toString());
-                }
-            });
-
-        Button cancelButton = findViewById(R.id.canceltheshit);
-            cancelButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                seeking.stop();
-                statusText.setText("Stopped");
-                }
-            });
-
-        Button startButton = findViewById(R.id.start);
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                seeking.startLookingForTarget();
-                statusText.setText(seeking.state.toString());
-            }
-        });
-
-        // TODO: This needs to be gone @Sulwen
-        findViewById(R.id.user_yes).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                seeking.handleUserAnswer(true);
-            }
-        });
-
-        findViewById(R.id.user_no).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                seeking.handleUserAnswer(false);
-            }
-        });
-
-        findViewById(R.id.user_sorry).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                seeking.handleApology();
-            }
-        });
     }
 
     @Override

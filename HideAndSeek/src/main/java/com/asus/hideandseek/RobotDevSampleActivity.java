@@ -75,7 +75,7 @@ public class RobotDevSampleActivity extends com.robot.asus.robotactivity.RobotAc
         super.onResume();
 
         //hide expression
-        robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+        //robotAPI.robot.setExpression(RobotFace.HIDEFACE);
     }
 
     public RobotDevSampleActivity() {

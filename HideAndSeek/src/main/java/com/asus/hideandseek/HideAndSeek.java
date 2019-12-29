@@ -38,7 +38,7 @@ public class HideAndSeek extends RobotActivity {
     private static int bodyMoved = 0;
     private static boolean moveHeadLeft = true;
     public enum NavigationState {
-        NOT_STARTED, MOVE_HEAD_UP, A_TO_B, MOVE_HEAD_LEFT, MOVE_HEAD_RIGHT, MOVE_HEAD_CENTER, MOVE_BODY
+        NOT_STARTED, A_TO_B, MOVE_HEAD_LEFT, MOVE_HEAD_RIGHT, MOVE_HEAD_CENTER, MOVE_BODY
     }
     public static NavigationState navigationState = NavigationState.NOT_STARTED;
 

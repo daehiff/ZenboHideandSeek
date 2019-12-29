@@ -74,14 +74,17 @@ public class Seeking {
                 if (people.size() == 1) {
                     String uuid = people.get(0).getUuid();
                     String name = robotAPI.contacts.family.getName(uuid);
-                    boolean isValidName = name != null && uuid.charAt(0) != '-';
+                    boolean isValidName = name != null && name != "" && uuid.charAt(4) != '-';
                     String message = (isValidName ? "Hey " + name + "!" : "Hey you there!") + " I found you!";
                     HideAndSeek.robotAPI.robot.speak(message);
                     robotAPI.robot.setExpression(RobotFace.HAPPY);
                     blinkAllLights(0x001111ff, 5, 50);
                     stop();
+                } else if (people.size() > 1) {
+                    robotAPI.robot.speak("Whoa, there are more of you! I found all of you!");
+                    robotAPI.robot.setExpression(RobotFace.HAPPY);
+                    stop();
                 }
-                state = SeekingState.NOT_STARTED;
                 break;
 
             default:
@@ -151,6 +154,7 @@ public class Seeking {
             countdownSeconds = 0;
             Point startPoint = new Point(11, 11);
             HideAndSeek.navigation.startSearchingRoom(startPoint);
+            robotAPI.robot.setExpression(RobotFace.ACTIVE);
 //            state = SEEKING;
         } else {
             delayHandler.postDelayed(repeatCountdown, 2000);

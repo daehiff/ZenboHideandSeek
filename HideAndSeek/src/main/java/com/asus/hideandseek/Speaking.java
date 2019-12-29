@@ -48,6 +48,7 @@ public class Speaking {
             case ASKING_TO_PLAY:
                 if (didUserSay(sentences, Arrays.asList("yes", "sure", "i do"))) {
                     seeking.handleUserAnswer(true);
+                    robotAPI.robot.stopSpeakAndListen();
                 } else if (didUserSay(sentences, Arrays.asList("no", "i do not", "i don't"))) {
                     seeking.handleUserAnswer(false);
                 } else if (didUserSay(sentences, "sorry")) {

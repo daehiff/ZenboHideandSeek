@@ -23,6 +23,7 @@ public class Navigation {
 
     public static ArrayList<Point> lineStringToPoints(String lineString) {
         //https://stackoverflow.com/questions/24256478/pattern-to-extract-text-between-parenthesis/24256532
+        // Regex?
         String pointsString = lineString.substring(lineString.indexOf("(")+1,lineString.indexOf(")"));
 
         ArrayList<String> pointsStrings = new ArrayList(Arrays.asList(pointsString.split(",")));

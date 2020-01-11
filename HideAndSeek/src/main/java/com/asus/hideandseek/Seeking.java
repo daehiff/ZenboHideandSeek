@@ -5,16 +5,21 @@ import android.os.Handler;
 import java.util.List;
 
 import com.asus.robotframework.API.RobotFace;
+import com.asus.robotframework.API.SpeakConfig;
 import com.asus.robotframework.API.Utility;
 import com.asus.robotframework.API.VisionConfig;
 import com.asus.robotframework.API.WheelLights;
 import com.asus.robotframework.API.results.DetectFaceResult;
 import com.asus.robotframework.API.results.DetectPersonResult;
+import com.asus.robotframework.API.results.RecognizePersonResult;
 
 import static com.asus.hideandseek.HideAndSeek.robotAPI;
 import static com.asus.hideandseek.HideAndSeek.seeking;
+import static com.asus.hideandseek.HideAndSeek.speaking;
 import static com.asus.hideandseek.HideAndSeek.statusText;
 import static com.asus.hideandseek.Seeking.SeekingState.ASKING_TO_PLAY;
+import static com.asus.hideandseek.Seeking.SeekingState.SEEKING;
+import static com.asus.robotframework.API.SpeakConfig.MODE_DEFAULT;
 
 public class Seeking {
     public static int DEFAULT_COUNTDOWN_TIME = 5;
@@ -30,6 +35,7 @@ public class Seeking {
     private int countdownSeconds = 0;
     private VisionConfig.PersonDetectConfig detectPersonConfig = new VisionConfig.PersonDetectConfig();
     private VisionConfig.FaceDetectConfig detectFaceConfig = new VisionConfig.FaceDetectConfig();
+    private VisionConfig.PersonRecognizeConfig personRecognizeConfig = new VisionConfig.PersonRecognizeConfig();
     Handler delayHandler = new Handler();
     Runnable repeatCountdown = new Runnable() {
         @Override
@@ -45,9 +51,13 @@ public class Seeking {
         detectPersonConfig.enableDebugPreview = debugMode;
         detectFaceConfig.enableDebugPreview = debugMode;
         detectPersonConfig.enableDetectHead = true;
+        personRecognizeConfig.interval = 2;
+        personRecognizeConfig.enableCandidateObj = false;
+        personRecognizeConfig.enableDebugPreview = debugMode;
+        personRecognizeConfig.enableDetectHead = true;
     }
 
-    public void handlePersonDetection(List<DetectPersonResult> people) {
+    public void handlePersonDetection(List<RecognizePersonResult> people) {
         switch (state) {
             case SEARCHING_FOR_TARGET:
                 if (people.size() > 1) {
@@ -55,7 +65,6 @@ public class Seeking {
                     robotAPI.robot.setExpression(RobotFace.SHOCKED);
                     blinkAllLights(0x00ff0000, 5, 20);
                 } else if (people.size() == 1) {
-                    state = ASKING_TO_PLAY;
                     robotAPI.robot.setExpression(RobotFace.CONFIDENT);
                     HideAndSeek.speaking.askForPlay();
                 }
@@ -63,14 +72,19 @@ public class Seeking {
 
             case SEEKING:
                 if (people.size() == 1) {
-                    if (people.get(0).getTrackConf() >= 1.0f) {
-                        HideAndSeek.robotAPI.robot.speak("Haha, I found you!");
-                        robotAPI.robot.setExpression(RobotFace.HAPPY);
-                        blinkAllLights(0x001111ff, 5, 50);
-                        stop();
-                    }
+                    String uuid = people.get(0).getUuid();
+                    String name = robotAPI.contacts.family.getName(uuid);
+                    boolean isValidName = name != null && name != "" && uuid.charAt(4) != '-';
+                    String message = (isValidName ? "Hey " + name + "!" : "Hey you there!") + " I found you!";
+                    HideAndSeek.robotAPI.robot.speak(message);
+                    robotAPI.robot.setExpression(RobotFace.HAPPY);
+                    blinkAllLights(0x001111ff, 5, 50);
+                    stop();
+                } else if (people.size() > 1) {
+                    robotAPI.robot.speak("Whoa, there are more of you! I found all of you!");
+                    robotAPI.robot.setExpression(RobotFace.HAPPY);
+                    stop();
                 }
-                state = SeekingState.NOT_STARTED;
                 break;
 
             default:
@@ -83,7 +97,7 @@ public class Seeking {
     }
 
     public void startLookingForTarget() {
-    //      robotAPI.robot.setExpression(RobotFace.EXPECTING)
+        switchToPersonDetection();
         state = SeekingState.SEARCHING_FOR_TARGET;
     }
 
@@ -92,9 +106,8 @@ public class Seeking {
             blinkAllLights(0x0011ff00, 2, 10);
             if (denialCount < 2) {
 //                HideAndSeek.robotAPI.utility.playEmotionalAction(RobotFace.ACTIVE, Utility.PlayAction.Head_up_1);
-                HideAndSeek.robotAPI.robot.speak("Okay! Hide now, I'm counting until five.");
+                HideAndSeek.robotAPI.robot.speak("I'm counting until five.");
                 robotAPI.robot.setExpression(RobotFace.TIRED);
-                seeking.switchToPersonDetection();
                 statusText.setText(seeking.state.toString());
                 startCountdown(DEFAULT_COUNTDOWN_TIME);
             } else {
@@ -141,6 +154,8 @@ public class Seeking {
             countdownSeconds = 0;
             Point startPoint = new Point(11, 11);
             HideAndSeek.navigation.startSearchingRoom(startPoint);
+            robotAPI.robot.setExpression(RobotFace.ACTIVE);
+//            state = SEEKING;
         } else {
             delayHandler.postDelayed(repeatCountdown, 2000);
         }
@@ -153,16 +168,16 @@ public class Seeking {
 
     public void switchToPersonDetection() {
         HideAndSeek.robotAPI.vision.cancelDetectFace();
-        HideAndSeek.robotAPI.vision.requestDetectPerson(detectPersonConfig);
+        HideAndSeek.robotAPI.vision.requestRecognizePerson(personRecognizeConfig);
     }
 
     public void switchToFaceDetection() {
-        HideAndSeek.robotAPI.vision.cancelDetectPerson();
+        HideAndSeek.robotAPI.vision.cancelRecognizePerson();
         HideAndSeek.robotAPI.vision.requestDetectFace(detectFaceConfig);
     }
 
     public void stop() {
-        HideAndSeek.robotAPI.vision.cancelDetectPerson();
+        HideAndSeek.robotAPI.vision.cancelRecognizePerson();
         HideAndSeek.robotAPI.vision.cancelDetectFace();
         HideAndSeek.navigation.stopAllMovement();
         state = SeekingState.NOT_STARTED;

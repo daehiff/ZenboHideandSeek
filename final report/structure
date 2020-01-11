@@ -1,0 +1,67 @@
+Experimental Setup:
+
+    - Zenbo
+        => picture of Zenbo! :D  TODO
+        => what is Zenbo?
+        => What can Zenbo do?
+    - Zenbo functionality
+        => how does it work?
+    Implementation Details
+        => general what language did we use?
+        1. Navigation
+            => how to scan the room?
+                -> Zenbo SDK provides a functionality in order to scan the room and map the coords
+                -> 
+            => how to navigate through the room?/moving Zenbos head?
+                -> The robot provides a function called goTo, which can be utilized in order to move through the room
+                -> We also used one function called moveHead in order to move the robots head either to the left or the the right
+            => how to search for persons? (Diagram Juila)
+                -> depths first search
+                -> seeking DFA
+                -> 
+        2. Computer Vision
+            => how to access the camera?
+                - Zenbo SDK does not provide direct access to the camera
+            => how to detect a person?
+                - Zenbo SDK built in functions:
+                - Callback result: TODO 
+            => approch to find persons?
+                - for every detected person store their id
+                - seeker gets a id in case he asks zenbo to play with him
+                - in case we see a person we request the person to tuern around
+                - if that id matches the hider perfekt => we found him
+        3. Language Processing
+            => how to do with ZenboSDK?
+                - onEventUserUtterance callback with speech recognition => returns a JSON Object containing the understood sentences
+            => how to react respond towards user input?
+                - we handeled different senctces with different states
+                - what happened if zenbo did not undertstand the user?
+        4. User Interaction
+                => how to say sth to the user?
+                => other ways of expressing emotions?
+                => set face state?
+Results:
+    - Features we couldn't include because they wheren technically provided:
+        => 
+    - Difficulties with Zenbo
+
+        => Room mapping needs admin password
+            -> GFRP problem
+        => NLP did not provide proper speech rcognition
+        => CV modulke returned somtimes -15 for some reasons
+        => we couldn't create some features, because asus claims to have them but did not provide us:
+            - ...
+
+
+    - Improvements on Zenbo SDK
+        => Implementation: provide missing features
+        => Implementation: improve NLP/CV model or let the user use their own (Firebase, ... provides quite good and easy to use models)
+        => Implementation: work on a better and fully available documentation of the ZenboSDK
+        => Documentation: instead of providing 10 Monster projects create small how-to sections on some topics (Like the do it with Vue.js)
+
+Conclusion:
+    => important role of smart mobile robots for endusers
+    => endusers are able to write their own programs 
+    => as well as companys who can provide software for the endusers
+    => hide and seek as a challenging task for a robot with various different applications
+    => 

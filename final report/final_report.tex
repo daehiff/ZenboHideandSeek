@@ -250,12 +250,12 @@ In order to detect a persons face, the method $vision.requestDetectFace$ on the 
 in FaceDetectConfig, the following parameters can be adjusted: 
 \begin{table}[h]
 	\begin{tabular}{lll}
-		int  & interval                 & how often to check for faces                 \\
-		bool & enableDebugPreview       & \begin{tabular}[c]{@{}l@{}}show a preview of \\the detected face for debug purposes\end{tabular} \\
-		bool & enableDetectHead         & detect the persons face                      \\
-		bool & enableFacePosture        & detect where the user is looking                                    \\
-		bool & enableCandidateObj       & allows detection of person like things                                      \\
-		int  & intervalInMS             & timespan of one interval [ms]                \\
+		int  & interval           & how often to check for faces                 \\
+		bool & enableDebugPreview & \begin{tabular}[c]{@{}l@{}}show a preview of \\the detected face for debug purposes\end{tabular} \\
+		bool & enableDetectHead   & detect the persons face                      \\
+		bool & enableFacePosture  & detect where the user is looking             \\
+		bool & enableCandidateObj & allows detection of person like things       \\
+		int  & intervalInMS       & timespan of one interval [ms]                \\
 	\end{tabular}
 \end{table}\\
 In the robot callback the results can be obtained from a function called $onDetectFaceResult$.
@@ -280,8 +280,8 @@ corresponds to the sentence formulated by the user and parsed internally by the 
 Accordingly towards the state shown Figure \ref{fig:zenboSpeech} we parse the users answer.
 In order to be more user friendly we assured that Zenbo can understand multiple positive and negative answers:
 \begin{itemize}
-  \item Yes: "Yes", "sure", "i do", ...
-  \item No: "no", "i do not", "i don't", ...
+	\item Yes: "Yes", "sure", "i do", ...
+	\item No: "no", "i do not", "i don't", ...
 \end{itemize}
 The lists for yes and no could be extended by far more expressions but we limited ourselfs to those three.\\
 \begin{figure}  \label{fig:zenboSpeech}
@@ -358,10 +358,10 @@ Thank you for helping us with all the questions we had while our project and esp
 	\bibitem{b0} https://www.grandviewresearch.com/industry-analysis/smart-robots-market
 	\bibitem{b1} J. Gregory Trafton, J. Gregory Trafton, Dennis Perznowski: Children and robots learning to play hide and seek
 	\bibitem{b2} Bowen Baker, Ingmar Kanitscheider, Todor Markov: Emergent Tool Use From Multi-Agent Autocurricula
-  \bibitem{b3} Steven M. LaValle: PLANNING ALGORITHMS
-  \bibitem{b4} https://en.wikipedia.org/wiki/Speech\_recognition
-  \bibitem{b5} https://zenbo.asus.com/developer/documents/Design-Guideline/Zenbo-Introduction/Basic-Functions
-  \bibitem{b6} https://www.asus.com/Commercial-Intelligent-Robot/Zenbo/
+	\bibitem{b3} Steven M. LaValle: PLANNING ALGORITHMS
+	\bibitem{b4} https://en.wikipedia.org/wiki/Speech\_recognition
+	\bibitem{b5} https://zenbo.asus.com/developer/documents/Design-Guideline/Zenbo-Introduction/Basic-Functions
+	\bibitem{b6} https://www.asus.com/Commercial-Intelligent-Robot/Zenbo/
 \end{thebibliography}
 \vspace{12pt}
 \end{document}

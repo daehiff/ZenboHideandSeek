@@ -11,6 +11,7 @@ class Point {
         this.y = y;
     }
 
+	// citation: https://stackoverflow.com/questions/38675611/determine-if-point-is-in-set-of-coordinates-in-java
     public boolean insidePolygon(ArrayList<Point> polygon) {
         // figure out if its inside
         int intersections = 0;

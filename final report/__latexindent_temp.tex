@@ -12,7 +12,8 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Zenbo Hide and Seek \\ Final Report \\ {\large https://youtu.be/3y11ntDSEY4}}
+\title{Zenbo Hide and Seek \\ Final Report \\ 
+{\large Group video: \url{https://youtu.be/3y11ntDSEY4}}}
 \author{\\\IEEEauthorblockN{Julia Fiorino}
 	\IEEEauthorblockA{\textit{Dep. of Computer Science and Information Engineering} \\
 		\textit{University of Illinois at Urbana-Champaign}\\
@@ -169,10 +170,10 @@ people who are hiding. With the drop, range and ultrasonic sensors we wanted to 
 \subsection{Zenbo functionality}
 Zenbos operating system is Android, therefore it requires an Android application in order to run code on it.
 The App needs the Zenbo SDK in order to run Zenbo functions. 
-The SDK functions can then be accessed over the \textit{RobotAPI} object. 
-In order to instantiate, the object needs the application context and a object called \textit{RobotCallback}.
-Actions (like moveTo) can be triggered on the \textit{RobotAPI} object, while data is asynchronously processed 
-through the \textit{RobotCallback}. An illustration of the functionality can be seen in Figure \ref{fig:zenboSDK}. 
+The SDK functions can then be accessed over the $RobotAPI$ object. 
+In order to instantiate, the object needs the application context and a object called $RobotCallback$.
+Actions (like moveTo) can be triggered on the $RobotAPI$ object, while data is asynchronously processed 
+through the $RobotCallback$. An illustration of the functionality can be seen in Figure \ref{fig:zenboSDK}. 
 \begin{figure}  \label{fig:zenboSDK}
 	\begin{center}
 		\includegraphics[width=0.45\textwidth]{pics/zenboSDK.jpg}
@@ -187,9 +188,8 @@ Lastly, we will review user interactions with Zenbo.\\
 For navigation, we first needed to figure out how to scan the room properly, so 
 a map for movement could be created. Zenbo SDK provides a room scanning functionality, which we utilized.
 After scanning the room, the map with all room coordinates could be obtained with the 
-function \textit{contacts.room.getAllRoomInfo()} of the robotAPI.
-This gave us the rooms map in LinePoints, we checked then with the Ray casting algorithm (see section \ref{sec:raycasting}) if the adjacent points are reachable.\\ 
-Next we needed to figure out how to move Zenbo and Zenbo's head. In order to move to a certain position, the Zenbo SDK provides a function called \textit{motion.moveBody}.
+function $contacts.room.getAllRoomInfo()$ of the robotAPI.
+Next we needed to figure out how to move Zenbo and Zenbo's head. In order to move to a certain position, the Zenbo SDK provides a function called $motion.moveBody$.
 This function expects as arguments:
 \begin{table}[h]
 	\begin{tabular}{lll}
@@ -199,7 +199,7 @@ This function expects as arguments:
 		enum   & speedLevel          & how fast the robot should move      
 	\end{tabular}
 \end{table}\\
-In order to move the head of Zenbo to left and right, we utilized a function called \textit{motion.moveHead}.
+In order to move the head of Zenbo to left and right, we utilized a function called $motion.moveHead$.
 This function expects the following arguments: 
 \begin{table}[h]
 	\begin{tabular}{lll}
@@ -208,9 +208,9 @@ This function expects the following arguments:
 		enum  & speedLevel  & how fast the robot should move  its head         
 	\end{tabular}
 \end{table}\\
-From those two methods we created our wrappers: \textit{moveHeadLeft}, \textit{moveHeadRight}, \textit{moveHeadCenter} 
-and \textit{goToLocation}.
-\textit{goToLocation} takes as an argument one \textit{Intpoint}, which was our representation of a Point in the coordinate system.
+From those two methods we created our wrappers: $moveHeadLeft$, $moveHeadRight$, $moveHeadCenter$ 
+and $goToLocation$.
+$goToLocation$ takes as an argument one $Intpoint$, which was our representation of a Point in the coordinate system.
 The other methods we created need no further attributes.\\
 The next task we needed to fulfill was to search for people. Therefore we performed a depth first search (DFS).
 DFS is more suitable for this kind of problem, because the breath of the search tree was in our case $4^n$, 
@@ -242,22 +242,12 @@ if he does not detect any person the robot will move on.
 LaValle et al. \cite{b3} described a more efficient way, which requires cutting the room into sections in order to find a target.
 But we decided that the brute force solution was simpler and would make for a more fun for game, as the game would last longer.\\
 Different solution techniques could be applied in future implementations in order to get a level system.
-\subsubsection{Ray casting algorithm} \label{sec:raycasting}
-One interesting thing we encountered after constructing the Zenbo map and getting the data, was that the map area was returned to us in terms of a LinePoints, which is an array of points describing the perimeter of the map. 
-However, the premise of a BFS is having all available points known to you at the beginning, and gradually marking them as visited as you traverse through the map. 
-Therefore, in order to find out which points were on the map, we had to figure out a way to find out which points fall within the polygon described by the array of points. 
-For this, we used a strategy we had previously not heard of. The way this algorithm works is it checks how many times a ray intersects the edge of a polygon, and if it is an odd number of times the point is inside the polygon whereas if it is an even number of times the point is outside the polygon \cite{b7}. 
-By doing this, we were able to check if the adjacent points to the current point we were at in our search was reachable or out of bounds, and were able to model a map that we knew all the coordinates of in advance.
-\begin{figure}[h]  \label{fig:raycasting}
-	\begin{center}
-		\includegraphics[width=0.4\textwidth]{pics/raycasting.png}
-	\end{center}
-	\caption{Ray casting algorithm, also known as even-odd rule algorithm}
-\end{figure}
+\subsubsection{Ray casting algorithm, also known as even-odd rule algorithm}
+One interesting thing we encountered after constructing the Zenbo map and getting the data, was that the map area was returned to us in terms of a LinePoints, which is an array of points describing the perimeter of the map. However, the premise of a BFS is having all available points known to you at the beginning, and gradually marking them as visited as you traverse through the map. Therefore, in order to find out which points were on the map, we had to figure out a way to find out which points fall within the polygon described by the array of points. For this, we used a strategy we had previously not heard of. The way this algorithm works is it checks how many times a ray intersects the edge of a polygon, and if it is an odd number of times the point is inside the polygon whereas if it is an even number of times the point is outside the polygon (citation here). By doing this, we were able to check if the adjacent points to the current point we were at in our search was reachable or out of bounds, and were able to model a map that we knew all the coordinates of in advance.
 \subsubsection{Computer Vision}
 We needed to combine computer vision with a learning algorithm in order to detect whether or not the robot has a person in front of it.
 We first tried to access the camera, but found out that Zenbo SDK only provides an already preprocessed face detection. So we decided to utilize this.\\
-In order to detect a persons face, the method \textit{vision.requestDetectFace} on the robotAPI needs to be called. This method requests a object, called \textit{FaceDetectConfig}.
+In order to detect a persons face, the method $vision.requestDetectFace$ on the robotAPI needs to be called. This method requests a object, called $FaceDetectConfig$.
 in FaceDetectConfig, the following parameters can be adjusted: 
 \begin{table}[h]
 	\begin{tabular}{lll}
@@ -269,10 +259,10 @@ in FaceDetectConfig, the following parameters can be adjusted:
 		int  & intervalInMS       & timespan of one interval [ms]                \\
 	\end{tabular}
 \end{table}\\
-In the robot callback the results can be obtained from a function called \textit{onDetectFaceResult}.
-This method returns a list of objects, named \textit{DetectFaceResult}, which contains all information about the detected faces.
-The only attribute from \textit{DetectFaceResult} that is in our interest is the UUID of the detected person, since we only want to compare the appearance of two people.\\
-Figure \ref{fig:computerVision} shows the states that are possible when detecting a person. If \textit{onDetectFaceResult} is called, whether or not 
+In the robot callback the results can be obtained from a function called $onDetectFaceResult$.
+This method returns a list of objects, named $DetectFaceResult$, which contains all information about the detected faces.
+The only attribute from $DetectFaceResult$ that is in our interest is the UUID of the detected person, since we only want to compare the appearance of two people.\\
+Figure \ref{fig:computerVision} shows the states that are possible when detecting a person. If $onDetectFaceResult$ is called, whether or not 
 the robot is in seeking mode is checked. In case the robot is in seeking mode, the UUID gets compared and if the person is in front of the robot, Zenbo makes a happy face
 and says: \textit{'I found you! \{name\}'}. If Zenbo is searching for people to play hide and seek with him, he refuses to play with a group, but 
 in case of one person, he asks the person if she wants to play with him. In case the person confirms Zenbo counts until a fixed number and then searches for the user.
@@ -285,7 +275,7 @@ in case of one person, he asks the person if she wants to play with him. In case
 \subsubsection{Speech recognition} \label{sec:speechreconition}
 Speech recognition is a interdisciplinary subfield of computer linguistics, that enables and develops methodologies and techniques in order to process 
 natural language towards written text. \cite{b4}  Applications can be found in smart home assistants or on smartphones.
-For our speech recognition task we used the Zenbo SDK. The SDK provides a callback called \textit{onEventUserUtterance}, in which a JSONObject can be found.
+For our speech recognition task we used the Zenbo SDK. The SDK provides a callback called $onEventUserUtterance$, in which a JSONObject can be found.
 From this JSONObject, we got the sub-object 'event\_user\_utterance' and from there we took the string: 'user\_utterance'. This string 
 corresponds to the sentence formulated by the user and parsed internally by the zenboSDK.\\
 Accordingly towards the state shown Figure \ref{fig:zenboSpeech} we parse the users answer.
@@ -304,7 +294,7 @@ The lists for yes and no could be extended by far more expressions but we limite
 \subsubsection{User Interaction}
 In order to interact with the user, we utilized the speech recognition described in Section \ref{sec:speechreconition}. We wanted to 
 interact with natural language instead of a touch screen in order to create a more natural user experience.
-So on a user command, we could reply via a function in the Zenbo SDK called: \textit{robot.speakAndListen}. This first made the robot speak the sentence we 
+So on a user command, we could reply via a function in the Zenbo SDK called: $robot.speakAndListen$. This first made the robot speak the sentence we 
 gave him, and afterwards triggered the voice in order to wait for user input.\\
 The two other ways how we handled communication with the user were setting the light of the weels to different colors in order to express the robots feelings and 
 by moving the robots head. With those methods we wanted to express the robot's emotions in order to have the user feel better connected to him.\\
@@ -330,7 +320,7 @@ But here the face recognition turned out to be very imprecise, and as we were un
 In this section we wanted to summarize the issues we had while realizing the project. We again grouped them in our 
 main three goals: Navigation, computer vision and language processing.
 \subsubsection{Navigation}
-For the navigation part Zenbo needs to create a map of the room, in order to give the maps coordinates back from the \textit{contacts.room.getAllRoomInfo()} method.\\
+For the navigation part Zenbo needs to create a map of the room, in order to give the maps coordinates back from the $contacts.room.getAllRoomInfo()$ method.\\
 We found out that we need admin rights in the Zenbo controller which we did not have. Therefore, we tried different emails together with the TAs 
 and came to the conclusion that the best would be to factory reset Zenbo. Because we have reset Zenbo we ran into Google's factory reset protection.
 Google's factory reset protection locks a smartphone (or any other android device after Android 5) 
@@ -362,10 +352,6 @@ Therefore, they serve a stepping stone in the increasing use of mobile robots by
 With our hide and seek game we tried to give ourselves a challenging task based on the requirements of a possible end user of Zenbo.
 Besides the few drawbacks we had while developing the App, it still was an interesting project and we learned a lot in the field of robotics
 with Zenbo.\\\\ 
-\section{Work divsion}
-Because we always needed to go to the lab in order to run our code on Zenbo we could barley split up our work.
-Therefore we mostly pair programmed our project in order to have a little security by a second person
-having a sight on our code.
 \section*{Acknowledgment}
 We would like to thank Professor Fu and the teaching assistants for the opportunity they gave us with this project.
 Thank you for helping us with all the questions we had while our project and especially thank you for repairing Zenbo after the factory reset.\\
@@ -377,8 +363,6 @@ Thank you for helping us with all the questions we had while our project and esp
 	\bibitem{b4}  ""
 	\bibitem{b5} https://zenbo.asus.com/developer/documents/Design-Guideline/Zenbo-Introduction/Basic-Functions
 	\bibitem{b6} https://www.asus.com/Commercial-Intelligent-Robot/Zenbo/
-	\bibitem{b7} https://stackoverflow.com/questions/38675611/determine-if-point-is-in-set-of-coordinates-in-java
-	\bibitem{b7} https://stackoverflow.com/questions/38675611/determine-if-point-is-in-set-of-coordinates-in-java
 \end{thebibliography}
 \vspace{12pt}
 \end{document}
